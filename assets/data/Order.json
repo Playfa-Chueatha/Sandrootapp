@@ -3,24 +3,24 @@
     "id": 1,
     "name": "กระบองเพชรขนนก",
     "price": 150,
-    "imageUrl": "assets/images/cactus1.jpg",
+    "imageUrl": "assets/images/cactus1.png",
     "description": "ต้นกระบองเพชรขนนก ทรงกลมขนนุ่ม เหมาะวางบนโต๊ะข้างหน้าต่าง",
-    "stock": 12
+    "category": "Indoor"
   },
   {
     "id": 2,
     "name": "กระบองเพชรโลมา",
     "price": 200,
-    "imageUrl": "assets/images/cactus2.jpg",
+    "imageUrl": "assets/images/cactus2.png",
     "description": "กระบองเพชรทรงซิกแซก คล้ายโลมาว่ายน้ำ ดูแลง่าย",
-    "stock": 8
+    "category": "Outdoor"
   },
   {
     "id": 3,
     "name": "กระบองเพชรแม่ลูกดก",
     "price": 180,
-    "imageUrl": "assets/images/cactus3.jpg",
+    "imageUrl": "assets/images/cactus3.png",
     "description": "สายพันธุ์แม่ลูกดก แตกกิ่งสวยงาม ออกดอกได้บ่อย",
-    "stock": 5
+    "category": "Indoor"
   }
 ]
