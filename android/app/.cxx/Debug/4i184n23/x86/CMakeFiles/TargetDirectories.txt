@@ -1,0 +1,2 @@
+D:/project/SandyRoots/sandy_roots/android/app/.cxx/Debug/4i184n23/x86/CMakeFiles/edit_cache.dir
+D:/project/SandyRoots/sandy_roots/android/app/.cxx/Debug/4i184n23/x86/CMakeFiles/rebuild_cache.dir
