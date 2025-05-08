@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Prompt',
         scaffoldBackgroundColor: const Color(0xFFF7F7F7),
       ),
-      home: const SplashScreen(), // เริ่มจากหน้า splash ก่อน
+      home: const SplashScreen(),
     );
   }
 }
