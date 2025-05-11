@@ -25,7 +25,7 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const category(),
-    const Listorder_buyer(),
+    const Listorder_buyer(cartItems: [], address: '', total: 0.0, status: '',orderNumber: ''),
     const Shpping_card(),
     const Myaccount_buyer(),
   ];

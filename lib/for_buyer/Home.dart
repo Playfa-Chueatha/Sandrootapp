@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/for_buyer/detailproduct.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -201,7 +202,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(height: screenHeight * 0.01),
                           Center(
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => Detailproduct(
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    description: product.description,
+                                    imageUrl: product.imageUrl,
+                                    category: product.category,
+                                  ))
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFA8D5BA),
                                 shape: RoundedRectangleBorder(

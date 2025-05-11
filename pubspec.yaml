@@ -58,8 +58,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
-    - assets/data/Order.json
+    - assets/data/Products.json
     - assets/data/users.json
+    - assets/data/order_data.json
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

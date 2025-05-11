@@ -1,0 +1,44 @@
+[
+    {
+      "province": "เชียงใหม่",
+      "districts": [
+        {
+          "name": "เมืองเชียงใหม่",
+          "subdistricts": [
+            {
+              "name": "ศรีภูมิ",
+              "zipcode": "50200"
+            },
+            {
+              "name": "พระสิงห์",
+              "zipcode": "50200"
+            }
+          ]
+        },
+        {
+          "name": "หางดง",
+          "subdistricts": [
+            {
+              "name": "หางดง",
+              "zipcode": "50230"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "province": "กรุงเทพมหานคร",
+      "districts": [
+        {
+          "name": "บางรัก",
+          "subdistricts": [
+            {
+              "name": "สีลม",
+              "zipcode": "10500"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  
