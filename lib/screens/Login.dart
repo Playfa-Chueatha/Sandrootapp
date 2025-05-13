@@ -243,7 +243,7 @@ class __LoginState extends State<_Login> {
                         );
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => AppbarBuyer(userManager: DataUser())),
+                          MaterialPageRoute(builder: (context) => AppbarBuyer(userDetails: widget.userManager,)),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

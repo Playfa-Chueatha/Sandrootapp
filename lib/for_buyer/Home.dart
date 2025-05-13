@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/for_buyer/detailproduct.dart';
+import 'package:sandy_roots/screens/Login.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final DataUser userDetails;
+  final String? selectedCategory;
+  const HomeScreen({
+    super.key, 
+    required this.userDetails,
+    this.selectedCategory,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -16,21 +23,33 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> _filteredProducts = [];
   final TextEditingController _searchController = TextEditingController();
   final List<String> _searchHistory = [];
+  String? _activeCategory;
+
 
   @override
   void initState() {
     super.initState();
+    _activeCategory = widget.selectedCategory;
     loadProducts();
   }
 
   Future<void> loadProducts() async {
-    final String response = await rootBundle.loadString('assets/data/Order.json');
+    final String response = await rootBundle.loadString('assets/data/Products.json');
     final data = await json.decode(response) as List;
+    final allProducts = data.map((e) => Product.fromJson(e)).toList();
+
     setState(() {
-      _products = data.map((e) => Product.fromJson(e)).toList();
-      _filteredProducts = _products;
+      _products = allProducts;
+      if (_activeCategory != null) {
+        _filteredProducts = allProducts
+            .where((p) => p.category.toLowerCase() == _activeCategory!.toLowerCase())
+            .toList();
+      } else {
+        _filteredProducts = allProducts;
+      }
     });
   }
+
 
   void _onSearch() {
     final query = _searchController.text.trim().toLowerCase();
@@ -70,10 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         title: const Text("Home"),
       ),
-      body: SafeArea(
+     body: SafeArea(
+      child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //------------------- banner ---------------------
+            // ------------------- banner ---------------------
             Container(
               width: double.infinity,
               height: screenHeight * 0.2,
@@ -99,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            //------------- Search Box + Button ----------------------
+            // ------------- Search Box + Button ----------------------
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
               child: Row(
@@ -123,20 +144,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: _onSearch,
+                    onPressed: () {
+                      if (_activeCategory != null) {
+                        setState(() {
+                          _activeCategory = null;
+                          _filteredProducts = _products;
+                        });
+                      } else {
+                        _onSearch();
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFA8D5BA),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text('ค้นหา', style: TextStyle(color: Colors.black)),
+                    child: Text(
+                      _activeCategory != null ? 'เคลียร์' : 'ค้นหา',
+                      style: const TextStyle(color: Colors.black),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            //----------------- Search Suggestions ------------------
+            // ----------------- Search Suggestions ------------------
             if (_searchController.text.isNotEmpty && _searchHistory.isNotEmpty)
               Container(
                 alignment: Alignment.centerLeft,
@@ -157,82 +190,89 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-            //---------------- Product List --------------------
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: GridView.builder(
-                  itemCount: _filteredProducts.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 0.7,
-                  ),
-                  itemBuilder: (context, index) {
-                    final product = _filteredProducts[index];
-                    return Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.asset(
-                              product.imageUrl,
-                              height: screenHeight * 0.15,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+            // ---------------- Product List --------------------
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: GridView.builder(
+                itemCount: _filteredProducts.length,
+                shrinkWrap: true, // <<< ให้ขนาดตามเนื้อหา
+                physics: const NeverScrollableScrollPhysics(), // <<< ไม่ให้เลื่อนใน GridView
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  final product = _filteredProducts[index];
+                  return Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            product.imageUrl,
+                            height: screenHeight * 0.15,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
                           ),
-                          SizedBox(height: screenHeight * 0.001),
-                          Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          Text(
-                            product.description,
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: screenHeight * 0.01),
-                          Text('${product.price} ฿', style: const TextStyle(color: Colors.green, fontSize: 14)),
-                          SizedBox(height: screenHeight * 0.01),
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => Detailproduct(
+                        ),
+                        SizedBox(height: screenHeight * 0.001),
+                        Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          product.description,
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        Text('${product.price} ฿', style: const TextStyle(color: Colors.green, fontSize: 14)),
+                        SizedBox(height: screenHeight * 0.01),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Detailproduct(
                                     id: product.id,
                                     name: product.name,
                                     price: product.price,
                                     description: product.description,
                                     imageUrl: product.imageUrl,
                                     category: product.category,
-                                  ))
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFA8D5BA),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                    userDetails: widget.userDetails,
+                                  ),
                                 ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFA8D5BA),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text('ดูรายละเอียด', style: TextStyle(fontSize: 12, color: Colors.black)),
                             ),
+                            child: const Text('ดูรายละเอียด', style: TextStyle(fontSize: 12, color: Colors.black)),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
+
+            const SizedBox(height: 20), 
           ],
         ),
       ),
-    );
+    ));
+
   }
 }

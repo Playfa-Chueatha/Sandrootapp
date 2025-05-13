@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sandy_roots/screens/Login.dart';
 
 class Myaccount_buyer extends StatefulWidget {
-  const Myaccount_buyer({super.key});
+  final DataUser userDetails;
+  const Myaccount_buyer({super.key, required this.userDetails});
 
   @override
   State<Myaccount_buyer> createState() => _Myaccount_buyerState();

@@ -1,35 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
-import 'package:sandy_roots/for_buyer/buyproducts.dart';
-import 'package:sandy_roots/screens/Appbar_buyer.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 
-class Detailproduct extends StatefulWidget {
+
+class Detailproduct_admin extends StatefulWidget {
   final int id;
   final String name;
   final int price;
   final String description;
   final String imageUrl;
   final String category;
-  final DataUser userDetails;
-  const Detailproduct({
+  const Detailproduct_admin({
     super.key, 
     required this.id, 
     required this.name, 
     required this.price, 
     required this.description, 
     required this.imageUrl, 
-    required this.category, 
-    required this.userDetails, 
-    
+    required this.category
   });
 
   @override
-  State<Detailproduct> createState() => _DetailproductState();
+  State<Detailproduct_admin> createState() => _DetailproductState();
 }
 
-class _DetailproductState extends State<Detailproduct> {
+class _DetailproductState extends State<Detailproduct_admin> {
   
   @override
   Widget build(BuildContext context) {
@@ -82,24 +77,9 @@ class _DetailproductState extends State<Detailproduct> {
                   children: [
                     OutlinedButton.icon(
                       onPressed: () {
-                        Cart.addItem({
-                          'id': widget.id,
-                          'name': widget.name,
-                          'price': widget.price,
-                          'imageUrl': widget.imageUrl,
-                        });
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => AppbarBuyer(
-                            selectedIndex: 3,
-                            userDetails: widget.userDetails,
-                            )),
-                        );
-
-
+                      
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${widget.name} ถูกเพิ่มลงในตะกร้าแล้ว')),
+                          SnackBar(content: Text('${widget.name} คุณกำลังอยู่ในมุมมองผู้ซื้อ')),
                         );
                       },
                       icon: Icon(Icons.shopping_bag),
@@ -107,26 +87,9 @@ class _DetailproductState extends State<Detailproduct> {
                     ),
                     OutlinedButton.icon(
                       onPressed: () {
-                        
-                        final oneItem = {
-                          'id': widget.id,
-                          'name': widget.name,
-                          'price': widget.price,
-                          'imageUrl': widget.imageUrl,
-                          'quantity': 1,
-                        };
-                        
-                        final oneTotal = widget.price * 1.0;
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => buyproducts(
-                              cartItems: [oneItem],   
-                              total: oneTotal,
-                              userDetails: widget.userDetails,     
-                            ),
-                          ),
+                
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${widget.name} คุณกำลังอยู่ในมุมมองผู้ซื้อ')),
                         );
                       },
                       icon: Icon(Icons.event_busy),

@@ -1,13 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sandy_roots/for_buyer/Listorder_buyer.dart';
+import 'package:sandy_roots/screens/Appbar_buyer.dart';
+import 'package:sandy_roots/screens/Login.dart';
 
 class buyproducts extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
   final double total;
+  final DataUser userDetails;
 
-  const buyproducts({super.key, required this.cartItems, required this.total});
+  const buyproducts({
+    super.key, 
+    required this.cartItems, 
+    required this.total, 
+    required this.userDetails, 
+    
+  });
 
   @override
   State<buyproducts> createState() => _buyproductsState();
@@ -88,7 +96,7 @@ class _buyproductsState extends State<buyproducts> {
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
                   if (addressController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('กรุณากรอกที่อยู่จัดส่ง')),
@@ -96,25 +104,23 @@ class _buyproductsState extends State<buyproducts> {
                     return;
                   }
 
-                  final newOrder = await Navigator.push(
+
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Listorder_buyer(
-                        cartItems: widget.cartItems,
-                        orderNumber: 'ORD-${DateTime.now().millisecondsSinceEpoch}',
-                        total: widget.total,
-                        address: addressController.text,
-                        status: 'รอการจัดส่ง',
+                      builder: (context) => AppbarBuyer(
+                        selectedIndex: 2,
+                        orderData: {
+                          'cartItems': widget.cartItems,
+                          'total': widget.total,
+                          'address': addressController.text,
+                          'status': 'รอการจัดส่ง',
+                          'orderNumber': 'ORD-${DateTime.now().millisecondsSinceEpoch}'
+                        }, userDetails: widget.userDetails, 
                       ),
                     ),
                   );
 
-
-                  if (newOrder != null) {
-                    setState(() {
-                      orders.add(newOrder);
-                    });
-                  }
                 },
                 child: const Text('ยืนยันการสั่งซื้อ'),
               ),

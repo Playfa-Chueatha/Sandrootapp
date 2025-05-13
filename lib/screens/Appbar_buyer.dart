@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -12,7 +11,18 @@ import 'package:sandy_roots/for_buyer/category.dart';
 import 'package:sandy_roots/screens/Login.dart';
 
 class AppbarBuyer extends StatefulWidget {
-  const AppbarBuyer({super.key, required DataUser userManager});
+  final DataUser userDetails;
+  final int selectedIndex;
+  final String? selectedCategory;
+  final Map<String, dynamic>? orderData;
+
+  const AppbarBuyer({
+    super.key,
+    this.selectedIndex = 0,
+    this.orderData,
+    required this.userDetails, 
+    this.selectedCategory,
+  });
 
   @override
   State<AppbarBuyer> createState() => _AppbarBuyerState();
@@ -21,15 +31,8 @@ class AppbarBuyer extends StatefulWidget {
 class _AppbarBuyerState extends State<AppbarBuyer> {
   List<Product> products = [];
   int _currentIndex = 0;
+  late List<Widget> _pages;
 
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const category(),
-    const Listorder_buyer(cartItems: [], address: '', total: 0.0, status: '',orderNumber: ''),
-    const Shpping_card(),
-    const Myaccount_buyer(),
-  ];
-  
   Future<void> productslist() async {
     try {
       final String response = await rootBundle.loadString('assets/data/Order.json');
@@ -46,6 +49,22 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
   void initState() {
     super.initState();
     productslist();
+    _currentIndex = widget.selectedIndex;
+
+    _pages = [
+      HomeScreen(userDetails: widget.userDetails,selectedCategory: widget.selectedCategory,),
+      category(userDetails: widget.userDetails,),
+      Listorder_buyer(
+        cartItems: widget.orderData?['cartItems'] ?? [],
+        address: widget.orderData?['address'] ?? '',
+        total: widget.orderData?['total'] ?? 0.0,
+        status: widget.orderData?['status'] ?? '',
+        orderNumber: widget.orderData?['orderNumber'] ?? '',
+        userDetails: widget.userDetails,
+      ),
+      Shpping_card(userDetails: widget.userDetails),
+      Myaccount_buyer(userDetails: widget.userDetails),
+    ];
   }
 
   @override
@@ -54,11 +73,11 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        backgroundColor:  Color(0xFFA8D5BA),
-        selectedItemColor: Color(0xFF657C55),
+        backgroundColor: const Color(0xFFA8D5BA),
+        selectedItemColor: const Color(0xFF657C55),
         unselectedItemColor: Colors.black54,
         onTap: (index) => setState(() => _currentIndex = index),
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'หน้าหลัก',
@@ -71,7 +90,6 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
             icon: Icon(Icons.list),
             label: 'รายการสั่งซื้อ',
           ),
-          
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'ตระกร้า',
@@ -83,4 +101,5 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
         ],
       ),
     );
-}}
+  }
+}

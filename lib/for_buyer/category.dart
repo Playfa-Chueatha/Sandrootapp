@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:sandy_roots/screens/Appbar_buyer.dart';
+import 'package:sandy_roots/screens/Login.dart';
 
 class category extends StatefulWidget {
-  const category({super.key});
+  final DataUser userDetails;
+  const category({super.key, required this.userDetails});
 
   @override
   State<category> createState() => _categoryState();
 }
 
 class _categoryState extends State<category> {
+  List<String> allCategories = ["สายขน", "ไม้ทนแดด", "ไม้ประดับ", "ไม้จิ๋ว/ไม้ถาด", "ไม้เลื้อย/หางยาว" ];
+  List<String> filteredCategories = [];
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    filteredCategories = List.from(allCategories);
+  }
+
+  void filterCategories(String query) {
+    final lowerQuery = query.toLowerCase();
+    setState(() {
+      filteredCategories = allCategories
+          .where((String category) => category.toLowerCase().contains(lowerQuery))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,8 +41,70 @@ class _categoryState extends State<category> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text("Category"),
-        actions: [
-          
+        
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: filterCategories,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: "ค้นหาหมวดหมู่",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                fillColor: Colors.white,
+                filled: true,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredCategories.length,
+              itemBuilder: (context, index) {
+                final category = filteredCategories[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AppbarBuyer(
+                            selectedIndex: 0,
+                            userDetails: widget.userDetails,
+                            selectedCategory: category,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundImage: AssetImage('assets/images/default_sandyroot.png'),
+                            backgroundColor: Colors.grey[200],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            category,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+
         ],
       ),
     );

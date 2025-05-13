@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sandy_roots/screens/Login.dart';
 
 class Listorder_buyer extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -8,7 +9,7 @@ class Listorder_buyer extends StatefulWidget {
   final double total;
   final String address;
   final String status;
-
+  final DataUser userDetails;
   const Listorder_buyer({
     super.key,
     required this.orderNumber, 
@@ -16,6 +17,7 @@ class Listorder_buyer extends StatefulWidget {
     required this.total,
     required this.address,
     required this.status, 
+    required this.userDetails, 
   });
 
   @override
@@ -111,7 +113,10 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
       itemBuilder: (context, index) {
         var order = orderList[index];
         return GestureDetector(
-          onTap: () => showOrderDetailDialog(context, order),
+          onTap: () => showOrderDetailDialog(context, order, () {
+                          setState(() {}); 
+                        }),
+
           child: Card(
             margin: const EdgeInsets.all(8),
             child: Padding(
@@ -163,74 +168,79 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
     );
   }
 
-  void showOrderDetailDialog(BuildContext context, dynamic order) {
-    int totalItems = List<Map<String, dynamic>>.from(order['cartItems'])
-        .fold(0, (sum, item) => item['quantity'] + sum);
+  void showOrderDetailDialog(
+    BuildContext context, dynamic order, VoidCallback onStatusChanged) {
+  int totalItems = List<Map<String, dynamic>>.from(order['cartItems'])
+      .fold(0, (sum, item) => item['quantity'] + sum);
 
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}'),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('ที่อยู่: ${order['address']}'),
-                const SizedBox(height: 8),
-                const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 6),
-                ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Image.asset(item['imageUrl'], width: 30, height: 30),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text('${item['name']} (x${item['quantity']})')),
-                        Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
-                      ],
-                    ),
-                  );
-                }),
-                const SizedBox(height: 10),
-                Text('จำนวนรวม: $totalItems ชิ้น'),
-                Text('ราคารวมทั้งหมด: ${order['total'].toStringAsFixed(2)} ฿'),
-                const SizedBox(height: 12),
-                Text('สถานะ: ${order['status']}', style: const TextStyle(color: Colors.orange)),
-              ],
-            ),
-          ),
-          actions: [
-            if (order['status'] == "กำลังจัดส่ง")
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    order['status'] = "จัดส่งสำเร็จ";
-                  });
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'ได้รับสินค้าแล้ว',
-                  style: TextStyle(color: Colors.green),
-                ),
-              ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('ปิด'),
-            ),
+  showDialog(
+    context: context,
+    builder: (_) => StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}'),
           ],
         ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('ที่อยู่: ${order['address']}'),
+              const SizedBox(height: 8),
+              const Text('รายการสินค้า:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      Image.asset(item['imageUrl'], width: 30, height: 30),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: Text('${item['name']} (x${item['quantity']})')),
+                      Text(
+                          '${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 10),
+              Text('จำนวนรวม: $totalItems ชิ้น'),
+              Text('ราคารวมทั้งหมด: ${order['total'].toStringAsFixed(2)} ฿'),
+              const SizedBox(height: 12),
+              Text('สถานะ: ${order['status']}',
+                  style: const TextStyle(color: Colors.orange)),
+            ],
+          ),
+        ),
+        actions: [
+          if (order['status'] == "กำลังจัดส่ง")
+            TextButton(
+              onPressed: () {
+                final index = orders.indexOf(order);
+                if (index != -1) {
+                  orders[index]['status'] = "จัดส่งสำเร็จ";
+                }
+
+                onStatusChanged(); 
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'ได้รับสินค้าแล้ว',
+                style: TextStyle(color: Color.fromARGB(255, 3, 27, 4)),
+              ),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ปิด'),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

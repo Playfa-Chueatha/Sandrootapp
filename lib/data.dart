@@ -28,45 +28,48 @@ class Product {
 
 //shopping Cart
 class Cart {
-  static List<Map<String, dynamic>> items = [];
-
-  static void addItem(Map<String, dynamic> newItem) {
-    int index = items.indexWhere((item) => item['id'] == newItem['id']);
-    if (index >= 0) {
-      items[index]['quantity'] += 1;
-    } else {
-      items.add({
-        ...newItem,
-        'quantity': 1,
-      });
-    }
-  }
-
-  static void increaseQuantity(int id) {
-    int index = items.indexWhere((item) => item['id'] == id);
-    if (index >= 0) {
-      items[index]['quantity'] += 1;
-    }
-  }
-
-  static void decreaseQuantity(int id) {
-    int index = items.indexWhere((item) => item['id'] == id);
-    if (index >= 0) {
-      if (items[index]['quantity'] > 1) {
-        items[index]['quantity'] -= 1;
-      } else {
-        items.removeAt(index);
-      }
-    }
-  }
+  static final List<Map<String, dynamic>> _items = [];
 
   static List<Map<String, dynamic>> getItems() {
-    return items;
+    return _items;
   }
 
   static double getTotalPrice() {
-    return items.fold(0, (sum, item) => sum + item['price'] * item['quantity']);
+    double total = 0;
+    for (var item in _items) {
+      total += item['price'] * item['quantity'];
+    }
+    return total;
+  }
+
+  static void addItem(Map<String, dynamic> newItem) {
+    final index = _items.indexWhere((item) => item['id'] == newItem['id']);
+    if (index >= 0) {
+      _items[index]['quantity'] += 1;
+    } else {
+      newItem['quantity'] = 1;
+      _items.add(newItem);
+    }
+  }
+
+  static void increaseQuantity(String id) {
+    final index = _items.indexWhere((item) => item['id'] == id);
+    if (index >= 0) {
+      _items[index]['quantity'] += 1;
+    }
+  }
+
+  static void decreaseQuantity(String id) {
+    final index = _items.indexWhere((item) => item['id'] == id);
+    if (index >= 0) {
+      if (_items[index]['quantity'] > 1) {
+        _items[index]['quantity'] -= 1;
+      } else {
+        _items.removeAt(index);
+      }
+    }
+  }
+  static void clear() {
+    _items.clear();
   }
 }
-
-
