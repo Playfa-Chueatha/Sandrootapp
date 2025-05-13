@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/for_buyer/buyproducts.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 
 class Detailproduct extends StatefulWidget {
@@ -12,7 +11,7 @@ class Detailproduct extends StatefulWidget {
   final String description;
   final String imageUrl;
   final String category;
-  final DataUser userDetails;
+  final UserProfile userDetails;
   const Detailproduct({
     super.key, 
     required this.id, 

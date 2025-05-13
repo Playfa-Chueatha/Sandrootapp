@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 class buyproducts extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
   final double total;
-  final DataUser userDetails;
+  final UserProfile userDetails;
 
   const buyproducts({
     super.key, 

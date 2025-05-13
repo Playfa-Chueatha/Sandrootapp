@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 class category extends StatefulWidget {
-  final DataUser userDetails;
+  final UserProfile userDetails;
   const category({super.key, required this.userDetails});
 
   @override
@@ -62,12 +62,18 @@ class _categoryState extends State<category> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
+            child: GridView.builder(
               itemCount: filteredCategories.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.7,
+              ),
               itemBuilder: (context, index) {
                 final category = filteredCategories[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   child: InkWell(
                     onTap: () {
                       Navigator.push(
@@ -104,7 +110,6 @@ class _categoryState extends State<category> {
               },
             ),
           )
-
         ],
       ),
     );

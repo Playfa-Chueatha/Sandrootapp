@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBay_admin.dart';
 
@@ -127,7 +124,7 @@ class _Login extends StatefulWidget {
 }
 
 class __LoginState extends State<_Login> {
-  final _formKey = GlobalKey<FormState>(); 
+  final _formKey = GlobalKey<FormState>();
   final usernameOrEmailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _isObscurd = true;
@@ -151,9 +148,9 @@ class __LoginState extends State<_Login> {
 
     return Center(
       child: Container(
-        margin: const EdgeInsets.all(10),      
+        margin: const EdgeInsets.all(10),
         child: Form(
-          key: _formKey, 
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -177,7 +174,6 @@ class __LoginState extends State<_Login> {
                 },
               ),
               SizedBox(height: screenHeight * 0.02),
-
               TextFormField(
                 controller: passwordController,
                 obscureText: _isObscurd,
@@ -187,10 +183,7 @@ class __LoginState extends State<_Login> {
                   filled: true,
                   fillColor: Colors.white,
                   suffixIcon: IconButton(
-                    padding: const EdgeInsetsDirectional.all(10.0),
-                    icon: _isObscurd
-                        ? const Icon(Icons.visibility_off)
-                        : const Icon(Icons.visibility),
+                    icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
                     onPressed: () {
                       setState(() {
                         _isObscurd = !_isObscurd;
@@ -216,47 +209,47 @@ class __LoginState extends State<_Login> {
                     String useroremail = usernameOrEmailController.text.trim();
                     String password = passwordController.text.trim();
 
-                    
                     if (useroremail == 'admin' && password == '1234') {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Login successful"),
-                          backgroundColor: Colors.green, 
+                        SnackBar(
+                          content: Text("Login successful"),
+                          backgroundColor: Colors.green,
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
-
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => ProductsScreen()), 
+                        MaterialPageRoute(builder: (context) => ProductsScreen()),
                       );
                     } else {
-                      
                       await widget.userManager.loadUsers();
                       bool success = widget.userManager.login(useroremail, password);
 
                       if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Wellcome to SandRoots store"),
-                            backgroundColor: Colors.green, 
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => AppbarBuyer(userDetails: widget.userManager,)),
-                        );
+                        UserProfile? user = widget.userManager.getUserProfile(useroremail, password);
+                        if (user != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Welcome to SandRoots store"),
+                              backgroundColor: Colors.green,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AppbarBuyer(userDetails: user),
+                            ),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                              "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
-                              style: TextStyle(color: Colors.white), 
-                            ),
-                            backgroundColor: Colors.red, 
+                            content: Text("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"),
+                            backgroundColor: Colors.red,
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
-
                       }
                     }
                   }
@@ -486,48 +479,3 @@ class _RegisterState extends State<_Register> {
 
 
 
-class DataUser {
-  List<Map<String, dynamic>> users = [];
-
-  Future<void> loadUsers() async {
-    final file = await _getUserFile();
-    if (await file.exists()) {
-      String content = await file.readAsString();
-      users = List<Map<String, dynamic>>.from(json.decode(content));
-    } else {
-      
-      String assetContent = await rootBundle.loadString('assets/data/users.json');
-      await file.writeAsString(assetContent);
-      users = List<Map<String, dynamic>>.from(json.decode(assetContent));
-    }
-  }
-
-  Future<void> saveUsers() async {
-    final file = await _getUserFile();
-    await file.writeAsString(json.encode(users));
-  }
-
-  Future<File> _getUserFile() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/users.json');
-  }
-
-  bool login(String usernameOrEmail, String password) {
-    return users.any((user) =>
-      (user['email'] == usernameOrEmail || user['username'] == usernameOrEmail)
-      && user['password'] == password);
-  }
-
-  bool register(String email, String username, String password) {
-    bool exists = users.any((u) =>
-      u['email'] == email || u['username'] == username);
-    if (exists) return false;
-
-    users.add({
-      'email': email,
-      'username': username,
-      'password': password,
-    });
-    return true;
-  }
-}

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sandy_roots/data.dart';
@@ -8,10 +7,9 @@ import 'package:sandy_roots/for_buyer/Listorder_buyer.dart';
 import 'package:sandy_roots/for_buyer/Myaccount.dart';
 import 'package:sandy_roots/for_buyer/Shpping_card.dart';
 import 'package:sandy_roots/for_buyer/category.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 class AppbarBuyer extends StatefulWidget {
-  final DataUser userDetails;
+  final UserProfile userDetails;
   final int selectedIndex;
   final String? selectedCategory;
   final Map<String, dynamic>? orderData;
@@ -54,12 +52,12 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
     _pages = [
       HomeScreen(userDetails: widget.userDetails,selectedCategory: widget.selectedCategory,),
       category(userDetails: widget.userDetails,),
-      Listorder_buyer(
-        cartItems: widget.orderData?['cartItems'] ?? [],
-        address: widget.orderData?['address'] ?? '',
-        total: widget.orderData?['total'] ?? 0.0,
-        status: widget.orderData?['status'] ?? '',
+     Listorder_buyer(
         orderNumber: widget.orderData?['orderNumber'] ?? '',
+        cartItems: List<Map<String, dynamic>>.from(widget.orderData?['cartItems'] ?? []),
+        total: widget.orderData?['total'] ?? 0.0,
+        address: widget.orderData?['address'] ?? '',
+        status: widget.orderData?['status'] ?? '',
         userDetails: widget.userDetails,
       ),
       Shpping_card(userDetails: widget.userDetails),

@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/for_buyer/detailproduct.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 class HomeScreen extends StatefulWidget {
-  final DataUser userDetails;
+  final UserProfile userDetails;
   final String? selectedCategory;
   const HomeScreen({
     super.key, 

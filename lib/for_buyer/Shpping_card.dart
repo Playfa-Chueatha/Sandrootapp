@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/for_buyer/buyproducts.dart';
-import 'package:sandy_roots/screens/Login.dart';
 
 class Shpping_card extends StatefulWidget {
-  final DataUser userDetails;
+  final UserProfile userDetails;
   const Shpping_card({
     super.key, 
     required this.userDetails
