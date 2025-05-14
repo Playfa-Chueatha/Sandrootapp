@@ -16,13 +16,11 @@ class Myaccount_buyer extends StatefulWidget {
 class _Myaccount_buyerState extends State<Myaccount_buyer> {
   File? _imageFile;
   final picker = ImagePicker();
-  late TextEditingController _usernameController;
   bool isEditing = false;
 
   @override
   void initState() {
     super.initState();
-    _usernameController = TextEditingController(text: widget.userDetails.username);
   }
 
   Future<void> _pickImage() async {
@@ -61,25 +59,6 @@ class _Myaccount_buyerState extends State<Myaccount_buyer> {
     await file.writeAsString(jsonEncode(updatedData));
   }
 
-  void _saveChanges() async {
-    String updatedUsername = _usernameController.text;
-    File? updatedImage = _imageFile;
-
-    await updateUserProfileToJson(
-      email: widget.userDetails.email,
-      username: updatedUsername,
-      profileImage: updatedImage,
-    );
-
-    setState(() {
-      widget.userDetails.username = updatedUsername;
-      isEditing = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("บันทึกการเปลี่ยนแปลงเรียบร้อยแล้ว")),
-    );
-  }
 
 
   @override
@@ -122,14 +101,10 @@ class _Myaccount_buyerState extends State<Myaccount_buyer> {
               ),
             ),
             const SizedBox(height: 20),
-            TextField(
-              controller: _usernameController,
-              enabled: isEditing,
-              decoration: InputDecoration(
-                labelText: "ชื่อผู้ใช้",
-                prefixIcon: const Icon(Icons.person),
-                border: const OutlineInputBorder(),
-              ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('ชื่อผู้ใช้'),
+              subtitle: Text(widget.userDetails.username),
             ),
             const SizedBox(height: 20),
             ListTile(
@@ -138,24 +113,7 @@ class _Myaccount_buyerState extends State<Myaccount_buyer> {
               subtitle: Text(widget.userDetails.email),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () {
-                if (isEditing) {
-                  _saveChanges();
-                } else {
-                  setState(() {
-                    isEditing = true;
-                  });
-                }
-              },
-              icon: Icon(isEditing ? Icons.save : Icons.edit),
-              label: Text(isEditing ? "บันทึกการเปลี่ยนแปลง" : "แก้ไขข้อมูล"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA8D5BA),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-            ),
+          
           ],
         ),
       ),

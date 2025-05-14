@@ -25,7 +25,7 @@ class _BuyerViewState extends State<BuyerView> {
   }
 
   Future<void> loadProducts() async {
-    final String response = await rootBundle.loadString('assets/data/Order.json');
+    final String response = await rootBundle.loadString('assets/data/Products.json');
     final data = await json.decode(response) as List;
     setState(() {
       _products = data.map((e) => Product.fromJson(e)).toList();

@@ -1,76 +1,118 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DataUser {
-  List<Map<String, dynamic>> users = [];
+  List<UserProfile> users = [];
+  final String _fileName = 'user_data.json';
+
+  // สร้าง getter สำหรับ _localFile
+  Future<File> get localFile async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/$_fileName');
+  }
 
   Future<void> loadUsers() async {
-    final file = await _getUserFile();
-    if (await file.exists()) {
-      String content = await file.readAsString();
-      users = List<Map<String, dynamic>>.from(json.decode(content));
+    final file = await localFile;
+
+    if (!await file.exists()) {
+      await file.writeAsString('[]'); 
+    }
+
+    final contents = await file.readAsString();
+
+    final dynamic jsonData = json.decode(contents);
+
+    if (jsonData is List) {
+      users = jsonData
+          .map((e) => UserProfile.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else if (jsonData is Map<String, dynamic>) {
+      users = [UserProfile.fromJson(jsonData)];
     } else {
-      String assetContent = await rootBundle.loadString('assets/data/users.json');
-      await file.writeAsString(assetContent);
-      users = List<Map<String, dynamic>>.from(json.decode(assetContent));
+      throw Exception('รูปแบบ JSON ไม่รองรับ');
     }
   }
 
+
   Future<void> saveUsers() async {
-    final file = await _getUserFile();
-    await file.writeAsString(json.encode(users));
+    final file = await localFile; // ใช้ localFile แทน _localFile
+    final jsonList = users.map((u) => u.toJson()).toList();
+    await file.writeAsString(jsonEncode(jsonList));
   }
 
-  Future<File> _getUserFile() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/users.json');
+  bool login(String idOrEmail, String password) {
+    final input = idOrEmail.toLowerCase();
+    return users.any((u) =>
+      (u.username.toLowerCase() == input || u.email.toLowerCase() == input) &&
+      u.password == password
+    );
   }
 
-  bool login(String usernameOrEmail, String password) {
-    return users.any((user) =>
-      (user['email'] == usernameOrEmail || user['username'] == usernameOrEmail)
-      && user['password'] == password);
+  UserProfile? getUserProfile(String idOrEmail, String password) {
+    try {
+      final input = idOrEmail.toLowerCase();
+      return users.firstWhere((u) =>
+        (u.username.toLowerCase() == input || u.email.toLowerCase() == input) &&
+        u.password == password
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   bool register(String email, String username, String password) {
-    bool exists = users.any((u) =>
-      u['email'] == email || u['username'] == username);
+    final inputEmail = email.toLowerCase();
+    final inputUser = username.toLowerCase();
+    final exists = users.any((u) =>
+      u.email.toLowerCase() == inputEmail ||
+      u.username.toLowerCase() == inputUser
+    );
     if (exists) return false;
 
-    users.add({
-      'email': email,
-      'username': username,
-      'password': password,
-    });
+    users.add(UserProfile(
+      email: email,
+      username: username,
+      password: password,
+      profileImage: 'assets/images/default_sandyroot.png',
+    ));
     return true;
-  }
-
-  // ✅ เพิ่มฟังก์ชันนี้เพื่อดึงข้อมูลผู้ใช้ที่ล็อกอิน
-  UserProfile? getUserProfile(String usernameOrEmail, String password) {
-    try {
-      final user = users.firstWhere((user) =>
-        (user['email'] == usernameOrEmail || user['username'] == usernameOrEmail) &&
-        user['password'] == password);
-
-      return UserProfile(
-        email: user['email'],
-        username: user['username'],
-      );
-    } catch (e) {
-      return null;
-    }
   }
 }
 
 
+
 //user
 class UserProfile {
-  final String email;
-  late final String username;
+  String email;
+  String username;
+  String password;
+  String profileImage;
 
-  UserProfile({required this.email, required this.username});
+  UserProfile({
+    required this.email,
+    required this.username,
+    required this.password,
+    required this.profileImage,
+  });
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      email: json['email'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      password: json['password'] as String? ?? '',
+      profileImage: json['profileImage'] as String? ?? '',
+    );
+  }
+
+
+
+  Map<String, dynamic> toJson() => {
+    'email': email,
+    'username': username,
+    'password': password,
+    'profileImage': profileImage,
+  };
 }
 
 

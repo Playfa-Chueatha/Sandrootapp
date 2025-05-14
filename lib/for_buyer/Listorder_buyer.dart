@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/data.dart';
 
-
 class Listorder_buyer extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
   final String orderNumber;
@@ -12,14 +11,15 @@ class Listorder_buyer extends StatefulWidget {
   final String address;
   final String status;
   final UserProfile userDetails;
+
   const Listorder_buyer({
     super.key,
-    required this.orderNumber, 
+    required this.orderNumber,
     required this.cartItems,
     required this.total,
     required this.address,
-    required this.status, 
-    required this.userDetails, 
+    required this.status,
+    required this.userDetails,
   });
 
   @override
@@ -47,24 +47,20 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
       'total': widget.total,
       'address': widget.address,
       'status': widget.status,
-      'email': widget.userDetails.email, // ใช้ 'email' แทน 'userEmail'
+      'email': widget.userDetails.email, // ใช้ 'email' ให้ตรงกัน
     };
 
     bool isNewOrder = loaded.every((order) => order['orderNumber'] != newOrder['orderNumber']);
 
     if (isNewOrder) {
       loaded.insert(0, newOrder);
-      await saveOrders(loaded); // บันทึกข้อมูลใหม่
+      await saveOrders(loaded);
     }
 
     setState(() {
-      // กรองคำสั่งซื้อโดยใช้ 'email' เพื่อให้แสดงคำสั่งซื้อของผู้ใช้ปัจจุบัน
       orders = loaded.where((order) => order['email'] == widget.userDetails.email).toList();
     });
   }
-
-
-
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -92,9 +88,6 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
     }
   }
 
-
-  
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -104,7 +97,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context, orders.last); 
+              Navigator.pop(context, orders.isNotEmpty ? orders.last : null);
             },
           ),
           title: const Text('รายการคำสั่งซื้อ'),
@@ -152,9 +145,8 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
         var order = orderList[index];
         return GestureDetector(
           onTap: () => showOrderDetailDialog(context, order, () {
-                          setState(() {}); 
-                        }),
-
+            setState(() {});
+          }),
           child: Card(
             margin: const EdgeInsets.all(8),
             child: Padding(
@@ -162,15 +154,12 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Text('สถานะ: ${order['status']}', style: const TextStyle(color: Colors.orange)),
                   const SizedBox(height: 8),
-                  Text(
-                    'ที่อยู่จัดส่ง: ${order['address']}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text('ที่อยู่จัดส่ง: ${order['address']}', maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 12),
                   const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 6),
@@ -181,9 +170,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                         children: [
                           Image.asset(item['imageUrl'], width: 40, height: 40),
                           const SizedBox(width: 10),
-                          Expanded(
-                            child: Text('${item['name']} (x${item['quantity']})'),
-                          ),
+                          Expanded(child: Text('${item['name']} (x${item['quantity']})')),
                           Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
                         ],
                       ),
@@ -194,7 +181,8 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('ราคารวมทั้งหมด:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('${order['total'].toStringAsFixed(2)} ฿', style: const TextStyle(color: Colors.green)),
+                      Text('${order['total'].toStringAsFixed(2)} ฿',
+                          style: const TextStyle(color: Colors.green)),
                     ],
                   ),
                 ],
@@ -227,8 +215,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
               children: [
                 Text('ที่อยู่: ${order['address']}'),
                 const SizedBox(height: 8),
-                const Text('รายการสินค้า:',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
                   return Padding(
@@ -237,10 +224,8 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                       children: [
                         Image.asset(item['imageUrl'], width: 30, height: 30),
                         const SizedBox(width: 8),
-                        Expanded(
-                            child: Text('${item['name']} (x${item['quantity']})')),
-                        Text(
-                            '${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
+                        Expanded(child: Text('${item['name']} (x${item['quantity']})')),
+                        Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
                       ],
                     ),
                   );
@@ -249,10 +234,9 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                 Text('จำนวนรวม: $totalItems ชิ้น'),
                 Text('ราคารวมทั้งหมด: ${order['total'].toStringAsFixed(2)} ฿'),
                 const SizedBox(height: 12),
-                Text('สถานะ: ${order['status']}',
-                    style: const TextStyle(color: Colors.orange)),
+                Text('สถานะ: ${order['status']}', style: const TextStyle(color: Colors.orange)),
                 const SizedBox(height: 12),
-                Text('อีเมลผู้สั่งซื้อ: ${order['userEmail']}'), 
+                Text('อีเมลผู้สั่งซื้อ: ${order['email']}'), // แก้ให้ตรงกับ key
               ],
             ),
           ),
@@ -263,15 +247,14 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                   final index = orders.indexOf(order);
                   if (index != -1) {
                     orders[index]['status'] = "จัดส่งสำเร็จ";
+                    saveOrders(orders); // อัปเดตสถานะในไฟล์ด้วย
                   }
 
-                  onStatusChanged(); 
+                  onStatusChanged();
                   Navigator.pop(context);
                 },
-                child: const Text(
-                  'ได้รับสินค้าแล้ว',
-                  style: TextStyle(color: Color.fromARGB(255, 3, 27, 4)),
-                ),
+                child: const Text('ได้รับสินค้าแล้ว',
+                    style: TextStyle(color: Color.fromARGB(255, 3, 27, 4))),
               ),
             TextButton(
               onPressed: () => Navigator.pop(context),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBay_admin.dart';
+import 'package:sandy_roots/screens/ShowUserJsonScreen%20.dart';
 
 class Mainlogin extends StatefulWidget {
   const Mainlogin({super.key});
@@ -20,18 +21,15 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChange);
-    userManager.loadUsers();
   }
 
   void _handleTabChange() {
-    if (_tabController.indexIsChanging) return; 
+    if (_tabController.indexIsChanging) return;
 
     setState(() {
       _containerHeightFactor = _tabController.index == 0 ? 0.5 : 0.6;
     });
   }
-
-  
 
   @override
   void dispose() {
@@ -128,19 +126,47 @@ class __LoginState extends State<_Login> {
   final usernameOrEmailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _isObscurd = true;
+  final DataUser dataUser = DataUser();
 
   @override
   void dispose() {
     usernameOrEmailController.dispose();
     passwordController.dispose();
     super.dispose();
+    dataUser.loadUsers(); 
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _isObscurd = true;
+  
+
+  void loginUser() {
+    String email = usernameOrEmailController.text.trim();
+    String password = passwordController.text;
+
+    if (dataUser.login(email, password)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("เข้าสู่ระบบสำเร็จ"),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      // นำข้อมูลจาก UserProfile มาใช้ในที่นี้
+      UserProfile userProfile = dataUser.getUserProfile(email, password)!;  // สมมติว่า getUserProfile() ส่งคืน UserProfile
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AppbarBuyer(userDetails: userProfile)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("อีเมลหรือรหัสผ่านไม่ถูกต้อง"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +248,7 @@ class __LoginState extends State<_Login> {
                         MaterialPageRoute(builder: (context) => ProductsScreen()),
                       );
                     } else {
-                      await widget.userManager.loadUsers();
+                      await widget.userManager.loadUsers(); // ✅ รอให้โหลดเสร็จก่อน
                       bool success = widget.userManager.login(useroremail, password);
 
                       if (success) {
@@ -260,6 +286,16 @@ class __LoginState extends State<_Login> {
                 onPressed: () {},
                 child: Text("ลืมรหัสผ่าน", style: TextStyle(color: Colors.redAccent)),
               ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ShowUserTableScreen()),
+                  );
+
+                },
+                child: Text("ข้อมูล USER", style: TextStyle(color: Colors.redAccent)),
+              ),
             ],
           ),
         ),
@@ -267,9 +303,6 @@ class __LoginState extends State<_Login> {
     );
   }
 }
-
-
-
 
 class _Register extends StatefulWidget {
   @override
@@ -283,64 +316,78 @@ class _RegisterState extends State<_Register> {
   final TextEditingController confirmPasswordController = TextEditingController();
   final formkey = GlobalKey<FormState>();
   final DataUser dataUser = DataUser();
-  bool  _isObscurd = true;
-  bool  _isObscurd2 = true;
+  bool _isObscurd = true;
+  bool _isObscurd2 = true;
+
   @override
   void initState() {
     super.initState();
     dataUser.loadUsers();
-     _isObscurd = true;
-     _isObscurd2 = true;
+  }
+
+  bool isValidEmail(String email) {
+    final regex = RegExp(r"^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com)$");
+    return regex.hasMatch(email);
+  }
+
+  bool isValidUsername(String username) {
+    final regex = RegExp(r"^[a-zA-Z0-9-_@]+$");
+    return regex.hasMatch(username) && !RegExp(r'[\u0E00-\u0E7F]').hasMatch(username);
+  }
+
+  bool isValidPassword(String password) {
+    return password.length >= 5;
   }
 
   void registerUser() async {
-  String email = emailController.text.trim();
-  String username = usernameController.text.trim();
-  String password = passwordController.text;
-  String confirmPassword = confirmPasswordController.text;
+    String email = emailController.text.trim();
+    String username = usernameController.text.trim();
+    String password = passwordController.text;
+    String confirmPassword = confirmPasswordController.text;
 
-  
-  if (formkey.currentState?.validate() ?? false) {  
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("รหัสผ่านไม่ตรงกัน"),
-            backgroundColor: Colors.red, 
+    if (formkey.currentState?.validate() ?? false) {
+      if (password != confirmPassword) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("รหัสผ่านไม่ตรงกัน"),
+            backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
+          ),
+        );
+        return;
+      }
 
-    bool success = dataUser.register(email, username, password);
-    if (success) {
-      await dataUser.saveUsers();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("สมัครสมาชิกสำเร็จ"),
-            backgroundColor: Colors.green, 
+      bool success = dataUser.register(email, username, password);
+      if (success) {
+        await dataUser.saveUsers();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("สมัครสมาชิกสำเร็จ"),
+            backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
-        ),
-      );
+          ),
+        );
 
-      emailController.clear();
-      usernameController.clear();
-      passwordController.clear();
-      confirmPasswordController.clear();
+        emailController.clear();
+        usernameController.clear();
+        passwordController.clear();
+        confirmPasswordController.clear();
 
-      Navigator.pushReplacement(
-      context,
-        MaterialPageRoute(builder: (context) => Mainlogin()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("มีผู้ใช้นี้อยู่แล้ว"),
-            backgroundColor: Colors.red, 
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Mainlogin()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("มีผู้ใช้นี้อยู่แล้ว"),
+            backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
-        ),
-      );
+          ),
+        );
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -350,11 +397,12 @@ class _RegisterState extends State<_Register> {
       child: Center(
         child: Container(
           margin: const EdgeInsets.all(20),
-            child: Form(
-              key: formkey,
-              child:Column(
+          child: Form(
+            key: formkey,
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Email
                 TextFormField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -368,13 +416,17 @@ class _RegisterState extends State<_Register> {
                     ),
                   ),
                   validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกอีเมล';
-                  }
-                  return null;
-                },
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกอีเมล';
+                    } else if (!isValidEmail(value)) {
+                      return 'กรุณากรอกอีเมลที่ถูกต้อง (เฉพาะ @gmail.com หรือ @hotmail.com)';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: screenHeight * 0.02),
+
+                // Username
                 TextFormField(
                   controller: usernameController,
                   decoration: InputDecoration(
@@ -388,13 +440,17 @@ class _RegisterState extends State<_Register> {
                     ),
                   ),
                   validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกชื่อผู้ใช้';
-                  }
-                  return null;
-                },
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกชื่อผู้ใช้';
+                    } else if (!isValidUsername(value)) {
+                      return 'ชื่อผู้ใช้ต้องมีอักษรภาษาอังกฤษและอักษรพิเศษอย่างน้อย 1 ตัว';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: screenHeight * 0.02),
+
+                // Password
                 TextFormField(
                   controller: passwordController,
                   obscureText: _isObscurd,
@@ -403,29 +459,31 @@ class _RegisterState extends State<_Register> {
                     hintText: 'Password',
                     filled: true,
                     fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _isObscurd = !_isObscurd;
+                        });
+                      },
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
                     ),
-                    suffixIcon: IconButton(
-                      onPressed: (){
-                        setState(() {
-                          _isObscurd = !_isObscurd;
-                        });
-                    }, 
-                    icon: _isObscurd
-                      ? const Icon(Icons.visibility_off)
-                      : const Icon(Icons.visibility),
-                    )
                   ),
                   validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกรหัสผ่าน';
-                  }
-                  return null;
-                },
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกรหัสผ่าน';
+                    } else if (!isValidPassword(value)) {
+                      return 'รหัสผ่านต้องมีอย่างน้อย 5 ตัวอักษร';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: screenHeight * 0.02),
+
+                // Confirm Password
                 TextFormField(
                   controller: confirmPasswordController,
                   obscureText: _isObscurd2,
@@ -434,29 +492,31 @@ class _RegisterState extends State<_Register> {
                     hintText: 'Confirm Password',
                     filled: true,
                     fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(_isObscurd2 ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _isObscurd2 = !_isObscurd2;
+                        });
+                      },
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
                     ),
-                    suffixIcon: IconButton(
-                      onPressed: (){
-                        setState(() {
-                          _isObscurd2 = !_isObscurd2;
-                        });
-                    }, 
-                    icon: _isObscurd2
-                      ? const Icon(Icons.visibility_off)
-                      : const Icon(Icons.visibility),
-                    )
                   ),
                   validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกยืนยันรหัสผ่าน';
-                  }
-                  return null;
-                },
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกยืนยันรหัสผ่าน';
+                    } else if (value != passwordController.text) {
+                      return 'รหัสผ่านไม่ตรงกัน';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: screenHeight * 0.07),
+
+                // Register Button
                 ElevatedButton(
                   onPressed: registerUser,
                   style: ElevatedButton.styleFrom(
@@ -476,6 +536,3 @@ class _RegisterState extends State<_Register> {
     );
   }
 }
-
-
-

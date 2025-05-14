@@ -6,8 +6,36 @@ import 'package:sandy_roots/for_admin/add_product.dart';
 import 'package:sandy_roots/for_admin/dialog_order.dart';
 import 'package:sandy_roots/data.dart';
 
-class Products_list extends StatelessWidget {
-  const Products_list({super.key});
+class ProductsList extends StatefulWidget {
+  const ProductsList({super.key});
+
+  @override
+  State<ProductsList> createState() => _ProductsListState();
+}
+
+class _ProductsListState extends State<ProductsList> {
+  List<Product> _products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    final jsonStr = await rootBundle.loadString('assets/data/Products.json');
+    final List<Product> loadedProducts =
+        (json.decode(jsonStr) as List).map((e) => Product.fromJson(e)).toList();
+    setState(() {
+      _products = loadedProducts;
+    });
+  }
+
+  void _addProduct(Product newProduct) {
+    setState(() {
+      _products.add(newProduct);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +58,8 @@ class Products_list extends StatelessWidget {
                   builder: (c) => const AddProductPage(),
                 ),
               );
-              if (result != null && result is Map<String, dynamic>) {
-                
+              if (result != null && result is Product) {
+                _addProduct(result);
               }
             },
             icon: const Icon(Icons.add),
@@ -39,67 +67,61 @@ class Products_list extends StatelessWidget {
           )
         ],
       ),
-      body: FutureBuilder<List<Product>>(
-        future: rootBundle.loadString('assets/data/Order.json').then(
-            (jsonStr) => (json.decode(jsonStr) as List)
-                .map((e) => Product.fromJson(e))
-                .toList()),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final products = snapshot.data!;
-          return ListView.builder(
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return Container(
-                height: screenHeight * 0.12,
-                margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundImage: AssetImage(product.imageUrl),
+      body: _products.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: _products.length,
+              itemBuilder: (context, index) {
+                final product = _products[index];
+                return Container(
+                  height: screenHeight * 0.12,
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AssetImage(product.imageUrl),
+                        ),
                       ),
-                    ),
-                    Expanded(child: Text(product.name)),
-                    Text('${product.price} ฿'),
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (c) => dialog_order(
-                            id: product.id,
-                            name: product.name,
-                            price: product.price,
-                            description: product.description,
-                            imageUrl: product.imageUrl,
-                            category: product.category,
-                            onSave: (updatedProduct) {
-                              
-                            },
-                            onDelete: (id) {
-                              
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
+                      Expanded(child: Text(product.name)),
+                      Text('${product.price} ฿'),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (c) => dialog_order(
+                              id: product.id,
+                              name: product.name,
+                              price: product.price,
+                              description: product.description,
+                              imageUrl: product.imageUrl,
+                              category: product.category,
+                              onSave: (updatedProduct) {
+                                setState(() {
+                                  _products[index] = updatedProduct;
+                                });
+                              },
+                              onDelete: (id) {
+                                setState(() {
+                                  _products.removeAt(index);
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
     );
   }
 }

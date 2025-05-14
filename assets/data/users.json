@@ -1,8 +1,14 @@
 [
-    {
-      "email": "test@example.com",
-      "username": "test",
-      "password": "123456"
-    }
-  ]
-  
+  {
+    "email": "abc@example.com",
+    "username": "test",
+    "profileImage": "assets/images/default_sandyroot.png",
+    "password": "123456"
+  },
+  {
+    "email": "user2@example.com",
+    "username": "user2",
+    "profileImage": "assets/images/default_sandyroot.png",
+    "password": "abcd"
+  }
+]
