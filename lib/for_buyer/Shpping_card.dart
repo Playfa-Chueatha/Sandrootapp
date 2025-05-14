@@ -52,15 +52,40 @@ class _Shpping_cardState extends State<Shpping_card> {
                           Text('ราคา: ${item['price']} ฿'),
                           Row(
                             children: [
+                              // ปุ่มลบ
                               IconButton(
                                 icon: Icon(Icons.remove),
-                                onPressed: () {
-                                  setState(() {
-                                    Cart.decreaseQuantity(item['id']);
-                                  });
-                                },
+                                onPressed: item['quantity'] > 1
+                                  ? () {
+                                      setState(() {
+                                        Cart.decreaseQuantity(item['id']);
+                                      });
+                                    }
+                                  : null,  // ปิดการใช้งานถ้าจำนวนสินค้าคือ 1
                               ),
-                              Text('${item['quantity']}'),
+                              
+                              // การกรอกจำนวนสินค้า
+                              SizedBox(
+                                width: 50,
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: TextEditingController(text: item['quantity'].toString()),
+                                  onChanged: (value) {
+                                    if (value.isNotEmpty && int.tryParse(value) != null) {
+                                      setState(() {
+                                        Cart.updateQuantity(item['id'], int.parse(value));
+                                      });
+                                    }
+                                  },
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 16),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                              
+                              // ปุ่มเพิ่ม
                               IconButton(
                                 icon: Icon(Icons.add),
                                 onPressed: () {
@@ -72,6 +97,16 @@ class _Shpping_cardState extends State<Shpping_card> {
                             ],
                           ),
                           Text('รวม: ${item['price'] * item['quantity']} ฿'),
+
+                          // ปุ่มลบรายการสินค้า
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                Cart.removeItem(item['id']);
+                              });
+                            },
+                            child: Text('ลบรายการสินค้า', style: TextStyle(color: Colors.red)),
+                          ),
                         ],
                       ),
                     );

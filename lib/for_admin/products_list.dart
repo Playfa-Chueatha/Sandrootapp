@@ -1,7 +1,7 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/for_admin/add_product.dart';
 import 'package:sandy_roots/for_admin/dialog_order.dart';
 import 'package:sandy_roots/data.dart';
@@ -22,20 +22,60 @@ class _ProductsListState extends State<ProductsList> {
     _loadProducts();
   }
 
+  Future<String> _getFilePath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/Products.json';  // ระบุตำแหน่งไฟล์ที่เก็บข้อมูล
+  }
+
   Future<void> _loadProducts() async {
-    final jsonStr = await rootBundle.loadString('assets/data/Products.json');
-    final List<Product> loadedProducts =
-        (json.decode(jsonStr) as List).map((e) => Product.fromJson(e)).toList();
-    setState(() {
-      _products = loadedProducts;
-    });
+  try {
+    final filePath = await _getFilePath();
+    final file = File(filePath);
+
+    // ตรวจสอบว่าไฟล์มีข้อมูลหรือไม่
+    if (await file.exists()) {
+      final jsonStr = await file.readAsString();
+      if (jsonStr.isNotEmpty) {
+        final List<Product> loadedProducts =
+            (json.decode(jsonStr) as List).map((e) => Product.fromJson(e)).toList();
+        setState(() {
+          _products = loadedProducts;
+        });
+      }
+    } else {
+      // กรณีที่ไฟล์ไม่พบหรือว่างเปล่า
+      setState(() {
+        _products = [];
+      });
+    }
+  } catch (e) {
+    // หากมีข้อผิดพลาดในการโหลด
+    print('Error loading products: $e');
+  }
+}
+
+
+
+
+  Future<void> _saveProducts() async {
+    try {
+      final filePath = await _getFilePath();
+      final file = File(filePath);
+
+      final jsonStr = json.encode(_products.map((e) => e.toJson()).toList());
+      await file.writeAsString(jsonStr);
+    } catch (e) {
+      // print('Error saving products: $e');
+    }
   }
 
   void _addProduct(Product newProduct) {
     setState(() {
       _products.add(newProduct);
     });
+    _saveProducts();  // บันทึกข้อมูลใหม่ลงไฟล์ JSON
   }
+
 
   @override
   Widget build(BuildContext context) {

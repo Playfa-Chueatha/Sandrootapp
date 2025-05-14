@@ -30,6 +30,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
   List<dynamic> orders = [];
   late TabController _tabController;
   late UserProfile userDetails;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -47,7 +48,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
       'total': widget.total,
       'address': widget.address,
       'status': widget.status,
-      'email': widget.userDetails.email, // ใช้ 'email' ให้ตรงกัน
+      'email': widget.userDetails.email, 
     };
 
     bool isNewOrder = loaded.every((order) => order['orderNumber'] != newOrder['orderNumber']);
@@ -59,8 +60,10 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
 
     setState(() {
       orders = loaded.where((order) => order['email'] == widget.userDetails.email).toList();
+      isLoading = false; 
     });
   }
+
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -111,7 +114,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
             ],
           ),
         ),
-        body: orders.isEmpty
+        body: isLoading
             ? const Center(child: CircularProgressIndicator())
             : TabBarView(
                 controller: _tabController,

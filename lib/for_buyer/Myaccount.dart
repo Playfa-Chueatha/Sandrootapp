@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/screens/Login.dart';
 
 class Myaccount_buyer extends StatefulWidget {
   final UserProfile userDetails;
@@ -113,6 +114,24 @@ class _Myaccount_buyerState extends State<Myaccount_buyer> {
               subtitle: Text(widget.userDetails.email),
             ),
             const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Mainlogin()),
+                );
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('ออกจากระบบ'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[300],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+
           
           ],
         ),
