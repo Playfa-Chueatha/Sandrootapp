@@ -66,7 +66,7 @@ class _AddProductPageState extends State<AddProductPage> {
       'price': price,
       'category': category,
       'description': description,
-      'image': _imageFile?.path ?? '',
+      'image': _imageFile?.path ?? 'assets/images/default_sandyroot.png',
     });
   
 

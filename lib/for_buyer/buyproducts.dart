@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sandy_roots/data.dart';
@@ -23,6 +24,8 @@ class buyproducts extends StatefulWidget {
 
 class _buyproductsState extends State<buyproducts> {
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController houseNoController = TextEditingController();
+  TextEditingController houseNumberController = TextEditingController();
   List provinces = [];
   List districts = [];
   List subdistricts = [];
@@ -35,25 +38,39 @@ class _buyproductsState extends State<buyproducts> {
   List<Map<String, dynamic>> orders = [];
 
   Future<void> loadAddressData() async {
-    final String response = await rootBundle.loadString('assets/thai_address.json');
+    final String response = await rootBundle.loadString('assets/data/thai_address.json');
     final data = json.decode(response);
     setState(() {
       provinces = data;
     });
   }
 
+  void updateFullAddress() {
+    if (houseNoController.text.isEmpty ||
+        selectedProvince == null ||
+        selectedDistrict == null ||
+        selectedSubdistrict == null ||
+        zipcode.isEmpty) {
+      return;
+    }
+
+    String fullAddress = '${houseNoController.text} '
+        'ต.$selectedSubdistrict อ.$selectedDistrict '
+        'จ.$selectedProvince $zipcode';
+
+    addressController.text = fullAddress;
+  }
+
+
   @override
   void initState() {
     super.initState();
     loadAddressData();
   }
-
   
-
-  
-
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
@@ -71,17 +88,98 @@ class _buyproductsState extends State<buyproducts> {
           children: [
             const Text('ที่อยู่จัดส่ง', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             TextField(
-              controller: addressController,
-              maxLines: 3,
+              controller: houseNoController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'กรุณากรอกที่อยู่จัดส่ง',
+                hintText: 'บ้านเลขที่/หมู่ที่',
+                labelText: 'บ้านเลขที่',
               ),
+              onChanged: (value) => updateFullAddress(),
             ),
+
+            const SizedBox(height: 10),
+
+            // จังหวัด
+            DropdownButton<String>(
+              hint: const Text('เลือกจังหวัด'),
+              value: selectedProvince,
+              items: provinces.map<DropdownMenuItem<String>>((province) {
+                return DropdownMenuItem<String>(
+                  value: province['province'],
+                  child: Text(province['province']),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedProvince = value;
+                  selectedDistrict = null;
+                  selectedSubdistrict = null;
+                  zipcode = '';
+                  districts = provinces.firstWhere((p) => p['province'] == value)['districts'];
+                  subdistricts = [];
+                });
+                updateFullAddress();
+              },
+            ),
+            const SizedBox(height: 10),
+
+            // อำเภอ
+            DropdownButtonFormField<String>(
+              value: selectedDistrict,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'อำเภอ',
+              ),
+              items: districts.map<DropdownMenuItem<String>>((district) {
+                return DropdownMenuItem<String>(
+                  value: district['name'],
+                  child: Text(district['name']),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedDistrict = value;
+                  selectedSubdistrict = null;
+                  final district = districts.firstWhere((d) => d['name'] == value);
+                  subdistricts = district['subdistricts'];
+                  zipcode = '';
+                });
+                updateFullAddress();
+              },
+            ),
+            const SizedBox(height: 10),
+
+            // ตำบล
+            DropdownButtonFormField<String>(
+              value: selectedSubdistrict,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'ตำบล',
+              ),
+              items: subdistricts.map<DropdownMenuItem<String>>((subdistrict) {
+                return DropdownMenuItem<String>(
+                  value: subdistrict['name'],
+                  child: Text(subdistrict['name']),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedSubdistrict = value;
+                  final district = districts.firstWhere((d) => d['name'] == selectedDistrict);
+                  final sub = district['subdistricts'].firstWhere((s) => s['name'] == value);
+                  zipcode = sub['zipcode'];
+                });
+                updateFullAddress();
+              },
+            ),
+            const SizedBox(height: 10),
+
+            // แสดงรหัสไปรษณีย์
+            Text('รหัสไปรษณีย์: $zipcode', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
             const Text('รายการสินค้า', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ...widget.cartItems.map((item) => ListTile(
-              leading: Image.asset(item['imageUrl'], width: 40, height: 40),
+              leading: buildImage(item['imageUrl']),
               title: Text(item['name']),
               subtitle: Text('จำนวน ${item['quantity']} | รวม ${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
             )),
@@ -128,6 +226,33 @@ class _buyproductsState extends State<buyproducts> {
           ],
         ),
       ),
+    );
+  }
+}
+
+
+Widget buildImage(String imageUrl) {
+  if (imageUrl.startsWith('/')) {
+    // เป็น path ของไฟล์ในเครื่อง
+    return Image.file(
+      File(imageUrl),
+      width: 40,
+      height: 40,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const Icon(Icons.broken_image);
+      },
+    );
+  } else {
+    // เป็น asset path
+    return Image.asset(
+      imageUrl,
+      width: 40,
+      height: 40,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const Icon(Icons.broken_image);
+      },
     );
   }
 }

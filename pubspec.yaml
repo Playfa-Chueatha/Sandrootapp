@@ -60,6 +60,7 @@ flutter:
     - assets/images/
     - assets/data/Products.json
     - assets/data/users.json
+    - assets/data/thai_address.json
     
 
   # The following line ensures that the Material Icons font is

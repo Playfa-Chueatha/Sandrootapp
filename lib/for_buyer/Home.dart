@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/for_buyer/detailproduct.dart';
 
@@ -33,20 +35,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadProducts() async {
-    final String response = await rootBundle.loadString('assets/data/Products.json');
-    final data = await json.decode(response) as List;
-    final allProducts = data.map((e) => Product.fromJson(e)).toList();
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/Products.json');
 
-    setState(() {
-      _products = allProducts;
-      if (_activeCategory != null) {
-        _filteredProducts = allProducts
-            .where((p) => p.category.toLowerCase() == _activeCategory!.toLowerCase())
-            .toList();
-      } else {
-        _filteredProducts = allProducts;
-      }
-    });
+
+    if (await file.exists()) {
+      final content = await file.readAsString();
+      final data = json.decode(content) as List;
+      setState(() {
+        _products = data.map((e) => Product.fromJson(e)).toList();
+        _filteredProducts = _products;
+      });
+    } else {
+      // กรณีที่ยังไม่มีไฟล์ ให้ copy จาก assets มา
+      final raw = await rootBundle.loadString('assets/data/Products.json');
+      await file.writeAsString(raw);
+      final data = json.decode(raw) as List;
+      setState(() {
+        _products = data.map((e) => Product.fromJson(e)).toList();
+        _filteredProducts = _products;
+      });
+    }
   }
 
 
@@ -214,16 +223,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            product.imageUrl,
-                            height: screenHeight * 0.15,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(20),
+                            child: product.imageUrl.startsWith('assets/')
+                                ? Image.asset(
+                                    product.imageUrl,
+                                    height: screenHeight * 0.15,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(product.imageUrl),
+                                    height: screenHeight * 0.15,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
-                        ),
                         SizedBox(height: screenHeight * 0.001),
-                        Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          product.name, 
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          ),
                         Text(
                           product.description,
                           style: const TextStyle(fontSize: 12, color: Colors.grey),

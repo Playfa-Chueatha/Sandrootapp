@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sandy_roots/for_admin/BuyerView.dart';
 import 'package:sandy_roots/for_admin/Listorder_admin.dart';
+import 'package:sandy_roots/for_admin/Myaccount.dart';
 import 'package:sandy_roots/for_admin/products_list.dart';
 import 'package:sandy_roots/data.dart';
 
@@ -21,6 +22,7 @@ class _OrderScreenState extends State<ProductsScreen> {
     const ProductsList(),
     const Listorder(),
     const BuyerView(),
+    const Myaccount(),
   ];
 
   Future<void> productslist() async {
@@ -63,6 +65,10 @@ class _OrderScreenState extends State<ProductsScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.visibility),
             label: 'มุมมองผู้ซื้อ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'บัญชีผู้ใช้',
           ),
         ],
       ),

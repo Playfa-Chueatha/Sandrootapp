@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBay_admin.dart';
 import 'package:sandy_roots/screens/ShowUserJsonScreen%20.dart';
@@ -283,7 +284,13 @@ class __LoginState extends State<_Login> {
                 child: Text('Login'),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Forgetpass()),
+                  );
+
+                },
                 child: Text("ลืมรหัสผ่าน", style: TextStyle(color: Colors.redAccent)),
               ),
               TextButton(

@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Listorder extends StatefulWidget {
   const Listorder({super.key});
@@ -20,12 +22,39 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
     _tabController = TabController(length: 3, vsync: this);
   }
 
-  Future<void> loadOrderData() async {
-    String jsonData = await rootBundle.loadString('assets/data/order_data.json');
-    setState(() {
-      orders = List.from(json.decode(jsonData));  // โหลดข้อมูลจาก JSON
-    });
+  Future<File> get _localFile async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/order_data.json');
   }
+
+  Future<void> loadOrderData() async {
+    try {
+      final file = await _localFile;
+      if (await file.exists()) {
+        final jsonString = await file.readAsString();
+        setState(() {
+          orders = jsonDecode(jsonString);
+        });
+      } else {
+        // ถ้าไฟล์ยังไม่มี ให้สร้างไฟล์เปล่า หรือโหลดจาก assets แล้วบันทึกลง local
+        String jsonData = await rootBundle.loadString('assets/data/order_data.json');
+        await file.writeAsString(jsonData);
+        setState(() {
+          orders = jsonDecode(jsonData);
+        });
+      }
+    } catch (e) {
+      setState(() {
+        orders = [];
+      });
+    }
+  }
+
+  Future<void> saveOrders(List<dynamic> updatedOrders) async {
+    final file = await _localFile;
+    await file.writeAsString(jsonEncode(updatedOrders));
+  }
+
 
   List<dynamic> filterOrdersByStatus(String status) {
     return orders.where((order) => order['status'] == status).toList();
@@ -75,8 +104,9 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
                       Align(
                         alignment: Alignment.bottomRight,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             order['status'] = 'กำลังจัดส่ง'; 
+                            await saveOrders(orders);
                             Navigator.pop(context); 
                             onStatusUpdated(); 
                           },

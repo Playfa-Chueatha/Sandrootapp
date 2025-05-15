@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
 import 'package:sandy_roots/for_buyer/buyproducts.dart';
@@ -44,7 +46,7 @@ class _Shpping_cardState extends State<Shpping_card> {
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     return ListTile(
-                      leading: Image.asset(item['imageUrl'], width: 50, height: 50),
+                      leading: buildImage(item['imageUrl'], width: 50, height: 50),
                       title: Text(item['name']),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,3 +162,28 @@ class _Shpping_cardState extends State<Shpping_card> {
     );
   }
 }
+
+Widget buildImage(String imageUrl, {double width = 50, double height = 50}) {
+  if (imageUrl.startsWith('/')) {
+    return Image.file(
+      File(imageUrl),
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const Icon(Icons.broken_image);
+      },
+    );
+  } else {
+    return Image.asset(
+      imageUrl,
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const Icon(Icons.broken_image);
+      },
+    );
+  }
+}
+

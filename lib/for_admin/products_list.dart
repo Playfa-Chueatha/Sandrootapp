@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/for_admin/add_product.dart';
 import 'package:sandy_roots/for_admin/dialog_order.dart';
@@ -24,36 +25,46 @@ class _ProductsListState extends State<ProductsList> {
 
   Future<String> _getFilePath() async {
     final directory = await getApplicationDocumentsDirectory();
-    return '${directory.path}/Products.json';  // ระบุตำแหน่งไฟล์ที่เก็บข้อมูล
+    return '${directory.path}/Products.json';
   }
 
   Future<void> _loadProducts() async {
-  try {
-    final filePath = await _getFilePath();
-    final file = File(filePath);
+    setState(() {
+    });
+    
+    try {
+      final filePath = await _getFilePath();
+      final file = File(filePath);
 
-    // ตรวจสอบว่าไฟล์มีข้อมูลหรือไม่
-    if (await file.exists()) {
-      final jsonStr = await file.readAsString();
-      if (jsonStr.isNotEmpty) {
+      if (await file.exists()) {
+        // โหลดจาก storage
+        final jsonStr = await file.readAsString();
+        if (jsonStr.isNotEmpty) {
+          final List<Product> loadedProducts =
+              (json.decode(jsonStr) as List).map((e) => Product.fromJson(e)).toList();
+          setState(() {
+            _products = loadedProducts;
+          });
+        }
+      } else {
+        // โหลดจาก assets เป็นข้อมูลเริ่มต้น
+        final jsonStr = await rootBundle.loadString('assets/data/Products.json');
         final List<Product> loadedProducts =
             (json.decode(jsonStr) as List).map((e) => Product.fromJson(e)).toList();
+
+        // บันทึกไฟล์ใน storage เพื่อใช้ต่อไป
+        await file.writeAsString(jsonStr);
+
         setState(() {
           _products = loadedProducts;
         });
       }
-    } else {
-      // กรณีที่ไฟล์ไม่พบหรือว่างเปล่า
-      setState(() {
-        _products = [];
-      });
+    } catch (e) {
+      // print('Error loading products: $e');
     }
-  } catch (e) {
-    // หากมีข้อผิดพลาดในการโหลด
-    print('Error loading products: $e');
   }
-}
 
+  
 
 
 
@@ -61,7 +72,6 @@ class _ProductsListState extends State<ProductsList> {
     try {
       final filePath = await _getFilePath();
       final file = File(filePath);
-
       final jsonStr = json.encode(_products.map((e) => e.toJson()).toList());
       await file.writeAsString(jsonStr);
     } catch (e) {
@@ -69,17 +79,39 @@ class _ProductsListState extends State<ProductsList> {
     }
   }
 
-  void _addProduct(Product newProduct) {
+  void _addProductFromMap(Map<String, dynamic> map) {
+    final newProduct = Product(
+      id: DateTime.now().millisecondsSinceEpoch,
+      name: map['name'],
+      price: int.tryParse(map['price'].toString()) ?? 0,
+      description: map['description'],
+      category: map['category'],
+      imageUrl: map['image'],
+    );
     setState(() {
       _products.add(newProduct);
     });
-    _saveProducts();  // บันทึกข้อมูลใหม่ลงไฟล์ JSON
+    _saveProducts();
   }
 
+  void _updateProduct(int index, Product updatedProduct) {
+    setState(() {
+      _products[index] = updatedProduct;
+    });
+    _saveProducts();
+  }
+
+  void _deleteProduct(int index) {
+    setState(() {
+      _products.removeAt(index);
+    });
+    _saveProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
@@ -98,8 +130,8 @@ class _ProductsListState extends State<ProductsList> {
                   builder: (c) => const AddProductPage(),
                 ),
               );
-              if (result != null && result is Product) {
-                _addProduct(result);
+              if (result != null && result is Map<String, dynamic>) {
+                _addProductFromMap(result);
               }
             },
             icon: const Icon(Icons.add),
@@ -108,7 +140,12 @@ class _ProductsListState extends State<ProductsList> {
         ],
       ),
       body: _products.isEmpty
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: Text(
+                'เพิ่มสินค้าของคุณ',
+                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              ),
+            )
           : ListView.builder(
               itemCount: _products.length,
               itemBuilder: (context, index) {
@@ -126,7 +163,9 @@ class _ProductsListState extends State<ProductsList> {
                         padding: const EdgeInsets.all(10),
                         child: CircleAvatar(
                           radius: 30,
-                          backgroundImage: AssetImage(product.imageUrl),
+                          backgroundImage: product.imageUrl.startsWith('assets/')
+                              ? AssetImage(product.imageUrl) as ImageProvider
+                              : FileImage(File(product.imageUrl)),
                         ),
                       ),
                       Expanded(child: Text(product.name)),
@@ -144,14 +183,10 @@ class _ProductsListState extends State<ProductsList> {
                               imageUrl: product.imageUrl,
                               category: product.category,
                               onSave: (updatedProduct) {
-                                setState(() {
-                                  _products[index] = updatedProduct;
-                                });
+                                _updateProduct(index, updatedProduct);
                               },
                               onDelete: (id) {
-                                setState(() {
-                                  _products.removeAt(index);
-                                });
+                                _deleteProduct(index);
                               },
                             ),
                           );

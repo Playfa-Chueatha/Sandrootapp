@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/data.dart';
 
@@ -31,6 +33,25 @@ class _DetailproductState extends State<Detailproduct_admin> {
     double screenHeight = MediaQuery.of(context).size.height;
     Cart.getItems();
     Cart.getTotalPrice();
+
+    
+    Widget imageWidget;
+    if (widget.imageUrl.startsWith('assets/')) {
+      imageWidget = Image.asset(
+        widget.imageUrl,
+        height: screenHeight * 0.4,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    } else {
+      imageWidget = Image.file(
+        File(widget.imageUrl),
+        height: screenHeight * 0.4,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
                 backgroundColor: const Color(0xFFA8D5BA),
@@ -42,12 +63,7 @@ class _DetailproductState extends State<Detailproduct_admin> {
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              Image.asset(
-                  widget.imageUrl,
-                  height: screenHeight * 0.4,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-              ),
+              imageWidget,
               Padding(
                 padding: EdgeInsets.fromLTRB(10,10,10,2),
                 child: Text(widget.name,style: TextStyle(
