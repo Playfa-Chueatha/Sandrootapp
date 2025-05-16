@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
+import 'package:sandy_roots/services/category_provider.dart';
 
 class category extends StatefulWidget {
   final UserProfile userDetails;
@@ -11,7 +12,8 @@ class category extends StatefulWidget {
 }
 
 class _categoryState extends State<category> {
-  List<String> allCategories = ["สายขน", "ไม้ทนแดด", "ไม้ประดับ", "ไม้จิ๋ว/ไม้ถาด", "ไม้เลื้อย/หางยาว" ];
+  final allCategories = CategoryManager.instance.categories;
+
   List<String> filteredCategories = [];
   TextEditingController searchController = TextEditingController();
 
@@ -36,10 +38,10 @@ class _categoryState extends State<category> {
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
         backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: const Text("Category"),
         
       ),

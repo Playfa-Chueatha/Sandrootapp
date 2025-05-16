@@ -3,16 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_Product.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/for_buyer/detailproduct.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserProfile userDetails;
   final String? selectedCategory;
+  final VoidCallback? onClearCategory;
   const HomeScreen({
     super.key, 
     required this.userDetails,
-    this.selectedCategory,
+    this.selectedCategory, this.onClearCategory,
   });
 
   @override
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> _searchHistory = [];
   String? _activeCategory;
+  
 
 
   @override
@@ -38,25 +41,32 @@ class _HomeScreenState extends State<HomeScreen> {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/Products.json');
 
-
     if (await file.exists()) {
       final content = await file.readAsString();
       final data = json.decode(content) as List;
+      final loadedProducts = data.map((e) => Product.fromJson(e)).toList();
+
       setState(() {
-        _products = data.map((e) => Product.fromJson(e)).toList();
-        _filteredProducts = _products;
+        _products = loadedProducts;
+        _filteredProducts = _activeCategory != null
+            ? loadedProducts.where((p) => p.category == _activeCategory).toList()
+            : loadedProducts;
       });
     } else {
-      // กรณีที่ยังไม่มีไฟล์ ให้ copy จาก assets มา
       final raw = await rootBundle.loadString('assets/data/Products.json');
       await file.writeAsString(raw);
       final data = json.decode(raw) as List;
+      final loadedProducts = data.map((e) => Product.fromJson(e)).toList();
+
       setState(() {
-        _products = data.map((e) => Product.fromJson(e)).toList();
-        _filteredProducts = _products;
+        _products = loadedProducts;
+        _filteredProducts = _activeCategory != null
+            ? loadedProducts.where((p) => p.category == _activeCategory).toList()
+            : loadedProducts;
       });
     }
   }
+
 
 
   void _onSearch() {
@@ -84,6 +94,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.selectedCategory != oldWidget.selectedCategory) {
+      setState(() {
+        _activeCategory = widget.selectedCategory;
+        _filteredProducts = _activeCategory != null
+            ? _products.where((p) => p.category == _activeCategory).toList()
+            : _products;
+      });
+    }
+  }
+
+
+  
+
+  @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -91,10 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
         backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: const Text("Home"),
       ),
      body: SafeArea(
@@ -153,10 +180,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
-                      if (_activeCategory != null) {
+                      if (_activeCategory != null || _searchController.text.isNotEmpty) {
                         setState(() {
                           _activeCategory = null;
-                          _filteredProducts = _products;
+                          _searchController.clear(); 
+                          _filteredProducts = _products; 
                         });
                       } else {
                         _onSearch();

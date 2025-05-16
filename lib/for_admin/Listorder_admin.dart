@@ -77,8 +77,9 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
+                    Text('อีเมลผู้สั่งซื้อ: ${order['email']}'),
                     Text('ที่อยู่: ${order['address']}'),
                     const SizedBox(height: 12),
                     const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),

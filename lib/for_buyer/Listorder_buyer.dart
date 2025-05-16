@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 
 class Listorder_buyer extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -97,12 +97,12 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context, orders.isNotEmpty ? orders.last : null);
-            },
-          ),
+          // leading: IconButton(
+          //   icon: const Icon(Icons.arrow_back),
+          //   onPressed: () {
+          //     Navigator.pop(context, orders.isNotEmpty ? orders.last : null);
+          //   },
+          // ),
           title: const Text('รายการคำสั่งซื้อ'),
           backgroundColor: const Color(0xFFA8D5BA),
           bottom: TabBar(
@@ -206,16 +206,12 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
       context: context,
       builder: (_) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}'),
-            ],
-          ),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                 Text('ที่อยู่: ${order['address']}'),
                 const SizedBox(height: 8),
                 const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -239,7 +235,7 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                 const SizedBox(height: 12),
                 Text('สถานะ: ${order['status']}', style: const TextStyle(color: Colors.orange)),
                 const SizedBox(height: 12),
-                Text('อีเมลผู้สั่งซื้อ: ${order['email']}'), // แก้ให้ตรงกับ key
+                
               ],
             ),
           ),

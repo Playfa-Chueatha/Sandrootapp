@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_shoppingCart.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/for_buyer/buyproducts.dart';
 
 class Shpping_card extends StatefulWidget {
@@ -25,10 +25,10 @@ class _Shpping_cardState extends State<Shpping_card> {
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
         backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: const Text("ตะกร้าสินค้า"),
       ),
       body: cartItems.isEmpty

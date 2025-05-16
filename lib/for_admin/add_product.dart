@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sandy_roots/services/category_provider.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -13,8 +14,13 @@ class _AddProductPageState extends State<AddProductPage> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _priceCtrl;
   late final TextEditingController _descCtrl;
-  late final TextEditingController _catCtrl;
+
   File? _imageFile;
+
+  
+  List<String> get categories => CategoryManager.instance.categories;
+  String? selectedCategory;
+  TextEditingController searchCategoryCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -22,7 +28,10 @@ class _AddProductPageState extends State<AddProductPage> {
     _nameCtrl = TextEditingController();
     _priceCtrl = TextEditingController();
     _descCtrl = TextEditingController();
-    _catCtrl = TextEditingController();
+
+    CategoryManager.instance.loadCategories().then((_) {
+      setState(() {}); 
+    });
   }
 
   @override
@@ -30,7 +39,7 @@ class _AddProductPageState extends State<AddProductPage> {
     _nameCtrl.dispose();
     _priceCtrl.dispose();
     _descCtrl.dispose();
-    _catCtrl.dispose();
+    searchCategoryCtrl.dispose();
     super.dispose();
   }
 
@@ -44,10 +53,95 @@ class _AddProductPageState extends State<AddProductPage> {
     }
   }
 
+  void _showCategorySelector() {
+    searchCategoryCtrl.clear();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        List<String> filteredCategories = categories;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            void filterCategories(String query) {
+              final filtered = categories.where((cat) =>
+                cat.toLowerCase().contains(query.toLowerCase())
+              ).toList();
+              setModalState(() {
+                filteredCategories = filtered;
+              });
+            }
+
+            void addNewCategory() {
+              final newCat = searchCategoryCtrl.text.trim();
+              if (newCat.isNotEmpty && !CategoryManager.instance.categories.contains(newCat)) {
+                setState(() {
+                  CategoryManager.instance.addCategory(newCat);
+                  selectedCategory = newCat;
+                });
+                Navigator.pop(context);
+              }
+            }
+
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                top: 16,
+                left: 16,
+                right: 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: searchCategoryCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'ค้นหาหมวดหมู่ หรือ เพิ่มใหม่',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: addNewCategory,
+                      ),
+                    ),
+                    onChanged: filterCategories,
+                  ),
+                  SizedBox(height: 12),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 300),
+                    child: filteredCategories.isEmpty
+                        ? Text('ไม่พบหมวดหมู่')
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: filteredCategories.length,
+                            itemBuilder: (context, index) {
+                              final cat = filteredCategories[index];
+                              return ListTile(
+                                title: Text(cat),
+                                onTap: () {
+                                  setState(() {
+                                    selectedCategory = cat;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _saveProduct() {
     String name = _nameCtrl.text.trim();
     String price = _priceCtrl.text.trim();
-    String category = _catCtrl.text.trim();
+    String category = selectedCategory ?? '';
     String description = _descCtrl.text.trim();
 
     if (name.isEmpty || price.isEmpty || category.isEmpty || description.isEmpty) {
@@ -68,9 +162,27 @@ class _AddProductPageState extends State<AddProductPage> {
       'description': description,
       'image': _imageFile?.path ?? 'assets/images/default_sandyroot.png',
     });
-  
-
   }
+
+  Future<void> addNewCategory() async {
+    final newCat = searchCategoryCtrl.text.trim();
+
+    
+    if (newCat.isNotEmpty && !CategoryManager.instance.categories.contains(newCat)) {      
+      await CategoryManager.instance.addCategory(newCat);
+
+      
+      setState(() {
+        selectedCategory = newCat;
+      });
+
+      
+      Navigator.pop(context);
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,13 +263,30 @@ class _AddProductPageState extends State<AddProductPage> {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _catCtrl,
-              decoration: const InputDecoration(
-                labelText: 'หมวดหมู่',
-                border: OutlineInputBorder(),
+
+            
+            InkWell(
+              onTap: _showCategorySelector,
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'หมวดหมู่',
+                  border: OutlineInputBorder(),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      selectedCategory ?? 'เลือกหมวดหมู่',
+                      style: TextStyle(
+                        color: selectedCategory == null ? Colors.grey : Colors.black,
+                      ),
+                    ),
+                    Icon(Icons.arrow_drop_down),
+                  ],
+                ),
               ),
             ),
+
             const SizedBox(height: 12),
             TextFormField(
               controller: _descCtrl,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBay_admin.dart';
@@ -16,6 +16,7 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   double _containerHeightFactor = 0.5;
   final userManager = DataUser();
+  
 
   @override
   void initState() {
@@ -115,6 +116,7 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
 
 class _Login extends StatefulWidget {
   final DataUser userManager;
+  
 
   const _Login({required this.userManager});
 
@@ -125,6 +127,9 @@ class _Login extends StatefulWidget {
 class __LoginState extends State<_Login> {
   final _formKey = GlobalKey<FormState>();
   final usernameOrEmailController = TextEditingController();
+  
+
+
   final passwordController = TextEditingController();
   bool _isObscurd = true;
   final DataUser dataUser = DataUser();
@@ -172,6 +177,7 @@ class __LoginState extends State<_Login> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    
 
     return Center(
       child: Container(
@@ -337,35 +343,83 @@ class _RegisterState extends State<_Register> {
     return regex.hasMatch(email);
   }
 
-  bool isValidUsername(String username) {
-    final regex = RegExp(r"^[a-zA-Z0-9-_@]+$");
-    return regex.hasMatch(username) && !RegExp(r'[\u0E00-\u0E7F]').hasMatch(username);
+  bool containsOnlyDigits(String s) {
+  return RegExp(r'^\d+$').hasMatch(s);
+}
+
+bool containsOnlySpecialChars(String s) {
+  // อักษรพิเศษที่ยอมรับ
+  final specialChars = RegExp(r'^[-_@.]+$');
+  return specialChars.hasMatch(s);
+}
+
+bool hasEnglishLetters(String s) {
+  return RegExp(r'[a-zA-Z]').hasMatch(s);
+}
+
+bool hasAtLeast3EnglishLetters(String s) {
+  final englishLetters = RegExp(r'[a-zA-Z]');
+  int count = s.split('').where((c) => englishLetters.hasMatch(c)).length;
+  return count >= 3;
+}
+
+bool hasSpecialChars(String s) {
+  final specialChars = RegExp(r'[-_@.]');
+  return specialChars.hasMatch(s);
+}
+
+bool isValidUsername(String username) {
+  final trimmed = username.trim();
+
+  
+  if (RegExp(r'[\u0E00-\u0E7F]').hasMatch(trimmed)) {
+    return false;
   }
+
+  
+  if (!RegExp(r'^[a-zA-Z0-9-_@.]+$').hasMatch(trimmed)) {
+    return false;
+  }
+
+  if (!hasAtLeast3EnglishLetters(trimmed)) {
+    return false;
+  }
+
+  if (!hasSpecialChars(trimmed)) {
+    return false;
+  }
+
+  return true;
+}
+
+
 
   bool isValidPassword(String password) {
     return password.length >= 5;
   }
 
   void registerUser() async {
-    String email = emailController.text.trim();
-    String username = usernameController.text.trim();
-    String password = passwordController.text;
-    String confirmPassword = confirmPasswordController.text;
+  String email = emailController.text.trim();
+  String username = usernameController.text.trim();
+  String password = passwordController.text;
+  String confirmPassword = confirmPasswordController.text;
 
-    if (formkey.currentState?.validate() ?? false) {
-      if (password != confirmPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("รหัสผ่านไม่ตรงกัน"),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        return;
-      }
+  if (formkey.currentState?.validate() ?? false) {
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("รหัสผ่านไม่ตรงกัน"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
-      bool success = dataUser.register(email, username, password);
-      if (success) {
+    RegisterResult result = dataUser.register(email, username, password);
+
+    switch (result) {
+      case RegisterResult.success:
         await dataUser.saveUsers();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -384,17 +438,31 @@ class _RegisterState extends State<_Register> {
           context,
           MaterialPageRoute(builder: (context) => Mainlogin()),
         );
-      } else {
+        break;
+
+      case RegisterResult.emailExists:
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("มีผู้ใช้นี้อยู่แล้ว"),
+            content: Text("อีเมลนี้ถูกใช้งานแล้ว"),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
         );
-      }
+        break;
+
+      case RegisterResult.usernameExists:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("ชื่อผู้ใช้นี้ถูกใช้งานแล้ว"),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        break;
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -426,7 +494,7 @@ class _RegisterState extends State<_Register> {
                     if (value == null || value.isEmpty) {
                       return 'กรุณากรอกอีเมล';
                     } else if (!isValidEmail(value)) {
-                      return 'กรุณากรอกอีเมลที่ถูกต้อง (เฉพาะ @gmail.com หรือ @hotmail.com)';
+                      return 'กรุณากรอกเฉพาะ @gmail.com หรือ @hotmail.com';
                     }
                     return null;
                   },
@@ -449,9 +517,26 @@ class _RegisterState extends State<_Register> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'กรุณากรอกชื่อผู้ใช้';
-                    } else if (!isValidUsername(value)) {
-                      return 'ชื่อผู้ใช้ต้องมีอักษรภาษาอังกฤษและอักษรพิเศษอย่างน้อย 1 ตัว';
                     }
+
+                    final trimmed = value.trim();
+
+                    
+                    if (RegExp(r'[\u0E00-\u0E7F]').hasMatch(trimmed)) {
+                      return 'ไม่อนุญาตให้กรอกภาษาไทย';
+                    }
+
+                    
+                    if (!RegExp(r'^[a-zA-Z0-9\-_.@]+$').hasMatch(trimmed)) {
+                      return 'ชื่อผู้ใช้สามารถประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวเลข และ . - _ @ เท่านั้น';
+                    }
+
+                    
+                    if (trimmed.length < 4) {
+                      return 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 4 ตัวอักษร';
+                    }
+
+                    
                     return null;
                   },
                 ),

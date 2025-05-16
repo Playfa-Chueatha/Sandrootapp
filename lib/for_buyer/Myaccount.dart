@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/screens/Login.dart';
 
 class Myaccount_buyer extends StatefulWidget {
@@ -68,10 +68,10 @@ class _Myaccount_buyerState extends State<Myaccount_buyer> {
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
         backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: const Text("บัญชีของฉัน"),
       ),
       body: SingleChildScrollView(

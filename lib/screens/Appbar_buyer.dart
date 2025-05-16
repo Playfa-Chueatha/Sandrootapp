@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sandy_roots/data.dart';
+import 'package:sandy_roots/Data/data_Product.dart';
+import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/for_buyer/Home.dart';
 import 'package:sandy_roots/for_buyer/Listorder_buyer.dart';
 import 'package:sandy_roots/for_buyer/Myaccount.dart';
@@ -11,15 +12,15 @@ import 'package:sandy_roots/for_buyer/category.dart';
 class AppbarBuyer extends StatefulWidget {
   final UserProfile userDetails;
   final int selectedIndex;
-  final String? selectedCategory;
   final Map<String, dynamic>? orderData;
+  final String? selectedCategory;
 
   const AppbarBuyer({
     super.key,
     this.selectedIndex = 0,
     this.orderData,
     required this.userDetails, 
-    this.selectedCategory,
+    this.selectedCategory, 
   });
 
   @override
@@ -29,7 +30,7 @@ class AppbarBuyer extends StatefulWidget {
 class _AppbarBuyerState extends State<AppbarBuyer> {
   List<Product> products = [];
   int _currentIndex = 0;
-  late List<Widget> _pages;
+  String? _selectedCategory;
 
   Future<void> productslist() async {
     try {
@@ -48,56 +49,83 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
     super.initState();
     productslist();
     _currentIndex = widget.selectedIndex;
+    _selectedCategory = widget.selectedCategory;
+  }
 
-    _pages = [
-      HomeScreen(userDetails: widget.userDetails,selectedCategory: widget.selectedCategory,),
-      category(userDetails: widget.userDetails,),
-     Listorder_buyer(
+  @override
+  void didUpdateWidget(covariant AppbarBuyer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // ถ้าค่า selectedCategory จาก prop มีการเปลี่ยนแปลง ให้ update state ด้วย
+    if (widget.selectedCategory != oldWidget.selectedCategory) {
+      setState(() {
+        _selectedCategory = widget.selectedCategory;
+      });
+    }
+  }
+
+  @override
+Widget build(BuildContext context) {
+    Widget currentPage;
+  switch (_currentIndex) {
+    case 0:
+      currentPage = HomeScreen(
+        key: UniqueKey(),
+        userDetails: widget.userDetails,
+        selectedCategory: _selectedCategory,
+        onClearCategory: () {
+          setState(() {
+            _selectedCategory = null;
+          });
+        },
+      );
+      break;
+    case 1:
+      currentPage = category(userDetails: widget.userDetails);
+      break;
+    case 2:
+      currentPage = Listorder_buyer(
         orderNumber: widget.orderData?['orderNumber'] ?? '',
         cartItems: List<Map<String, dynamic>>.from(widget.orderData?['cartItems'] ?? []),
         total: widget.orderData?['total'] ?? 0.0,
         address: widget.orderData?['address'] ?? '',
         status: widget.orderData?['status'] ?? '',
         userDetails: widget.userDetails,
-      ),
-      Shpping_card(userDetails: widget.userDetails),
-      Myaccount_buyer(userDetails: widget.userDetails),
-    ];
+      );
+      break;
+    case 3:
+      currentPage = Shpping_card(userDetails: widget.userDetails);
+      break;
+    case 4:
+      currentPage = Myaccount_buyer(userDetails: widget.userDetails);
+      break;
+    default:
+      currentPage = HomeScreen(userDetails: widget.userDetails);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        backgroundColor: const Color(0xFFA8D5BA),
-        selectedItemColor: const Color(0xFF657C55),
-        unselectedItemColor: Colors.black54,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'หน้าหลัก',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'หมวดหมู่',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'รายการสั่งซื้อ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'ตระกร้า',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'บัญชีผู้ใช้',
-          ),
-        ],
-      ),
-    );
-  }
+  return Scaffold(
+    body: currentPage,
+    bottomNavigationBar: BottomNavigationBar(
+      currentIndex: _currentIndex,
+      backgroundColor: const Color(0xFFA8D5BA),
+      selectedItemColor: const Color(0xFF657C55),
+      unselectedItemColor: Colors.black54,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+
+          if (index == 0) {
+            _selectedCategory = null; // รีเซตค่าเมื่อกลับหน้าโฮม
+          }
+        });
+      },
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก'),
+        BottomNavigationBarItem(icon: Icon(Icons.category), label: 'หมวดหมู่'),
+        BottomNavigationBarItem(icon: Icon(Icons.list), label: 'รายการสั่งซื้อ'),
+        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'ตระกร้า'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'บัญชีผู้ใช้'),
+      ],
+    ),
+  );
+}
 }
