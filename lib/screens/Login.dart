@@ -3,7 +3,7 @@ import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBay_admin.dart';
-import 'package:sandy_roots/screens/ShowUserJsonScreen%20.dart';
+// import 'package:sandy_roots/services/ShowUserJsonScreen%20.dart';
 
 class Mainlogin extends StatefulWidget {
   const Mainlogin({super.key});
@@ -299,16 +299,16 @@ class __LoginState extends State<_Login> {
                 },
                 child: Text("ลืมรหัสผ่าน", style: TextStyle(color: Colors.redAccent)),
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ShowUserTableScreen()),
-                  );
+              // TextButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => ShowUserTableScreen()),
+              //     );
 
-                },
-                child: Text("ข้อมูล USER", style: TextStyle(color: Colors.redAccent)),
-              ),
+              //   },
+              //   child: Text("ข้อมูล USER", style: TextStyle(color: Colors.redAccent)),
+              // ),
             ],
           ),
         ),

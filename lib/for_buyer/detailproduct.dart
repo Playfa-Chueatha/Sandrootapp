@@ -35,8 +35,9 @@ class _DetailproductState extends State<Detailproduct> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    Cart.getItems();
-    Cart.getTotalPrice();
+    Cart.getItems(widget.userDetails.email);
+    Cart.getTotalPrice(widget.userDetails.email);
+
 
     Widget imageWidget;
     if (widget.imageUrl.startsWith('assets/')) {
@@ -97,7 +98,7 @@ class _DetailproductState extends State<Detailproduct> {
                   children: [
                     OutlinedButton.icon(
                       onPressed: () {
-                        Cart.addItem({
+                        Cart.addItem(widget.userDetails.email, {
                           'id': widget.id,
                           'name': widget.name,
                           'price': widget.price,

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+// import 'package:sandy_roots/services/CategoryListPage.dart';
 import 'package:sandy_roots/services/category_provider.dart';
 
 class AddProductPage extends StatefulWidget {
@@ -197,6 +198,16 @@ class _AddProductPageState extends State<AddProductPage> {
         ),
         title: const Text("Add Product"),
         actions: [
+          // IconButton(
+          //     icon: const Icon(Icons.list),
+          //     tooltip: 'ดูหมวดหมู่ทั้งหมด',
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (_) => const CategoryListPage()),
+          //       );
+          //     },
+          //   ),
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: _saveProduct,

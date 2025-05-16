@@ -12,15 +12,22 @@ class category extends StatefulWidget {
 }
 
 class _categoryState extends State<category> {
-  final allCategories = CategoryManager.instance.categories;
-
+  List<String> allCategories = [];
   List<String> filteredCategories = [];
   TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    filteredCategories = List.from(allCategories);
+    loadCategories();
+  }
+
+  Future<void> loadCategories() async {
+    await CategoryManager.instance.loadCategories(); // โหลดจาก local storage หรือไฟล์
+    setState(() {
+      allCategories = List.from(CategoryManager.instance.categories);
+      filteredCategories = List.from(allCategories);
+    });
   }
 
   void filterCategories(String query) {
@@ -38,12 +45,7 @@ class _categoryState extends State<category> {
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
         backgroundColor: const Color(0xFFA8D5BA),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () => Navigator.pop(context),
-        // ),
         title: const Text("Category"),
-        
       ),
       body: Column(
         children: [
@@ -64,53 +66,57 @@ class _categoryState extends State<category> {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              itemCount: filteredCategories.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.7,
-              ),
-              itemBuilder: (context, index) {
-                final category = filteredCategories[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AppbarBuyer(
-                            selectedIndex: 0,
-                            userDetails: widget.userDetails,
-                            selectedCategory: category,
+            child: filteredCategories.isEmpty
+                ? const Center(child: Text('ไม่พบหมวดหมู่'))
+                : GridView.builder(
+                    itemCount: filteredCategories.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.7,
+                    ),
+                    itemBuilder: (context, index) {
+                      final category = filteredCategories[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AppbarBuyer(
+                                  selectedIndex: 0,
+                                  userDetails: widget.userDetails,
+                                  selectedCategory: category,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage:
+                                      AssetImage('assets/images/default_sandyroot.png'),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  category,
+                                  style: const TextStyle(
+                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundImage: AssetImage('assets/images/default_sandyroot.png'),
-                            backgroundColor: Colors.grey[200],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            category,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
-                );
-              },
-            ),
           )
         ],
       ),

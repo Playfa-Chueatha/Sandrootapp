@@ -1,0 +1,2 @@
+D:/project/SandyRoots/sandy_roots/android/app/.cxx/RelWithDebInfo/r72p3c31/x86/CMakeFiles/edit_cache.dir
+D:/project/SandyRoots/sandy_roots/android/app/.cxx/RelWithDebInfo/r72p3c31/x86/CMakeFiles/rebuild_cache.dir

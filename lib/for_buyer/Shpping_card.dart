@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/Data/data_shoppingCart.dart';
 import 'package:sandy_roots/Data/data_user.dart';
@@ -16,19 +15,35 @@ class Shpping_card extends StatefulWidget {
 }
 
 class _Shpping_cardState extends State<Shpping_card> {
+  List<Map<String, dynamic>> cartItems = [];
+  double total = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCart();
+  }
+
+  Future<void> _loadCart() async {
+    final items = await Cart.getItems(widget.userDetails.email);
+    final totalPrice = await Cart.getTotalPrice(widget.userDetails.email);
+    setState(() {
+      cartItems = items;
+      total = totalPrice;
+    });
+  }
+
+  // เมื่อแก้ไขตะกร้าแล้วโหลดข้อมูลใหม่
+  Future<void> _updateCart() async {
+    await _loadCart();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cartItems = Cart.getItems();
-    final total = Cart.getTotalPrice();
-
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
         backgroundColor: const Color(0xFFA8D5BA),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () => Navigator.pop(context),
-        // ),
         title: const Text("ตะกร้าสินค้า"),
       ),
       body: cartItems.isEmpty
@@ -46,7 +61,7 @@ class _Shpping_cardState extends State<Shpping_card> {
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     return ListTile(
-                      leading: buildImage(item['imageUrl'], width: 50, height: 50),
+                      leading: buildImage(item['imageUrl']),
                       title: Text(item['name']),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,29 +69,25 @@ class _Shpping_cardState extends State<Shpping_card> {
                           Text('ราคา: ${item['price']} ฿'),
                           Row(
                             children: [
-                              // ปุ่มลบ
                               IconButton(
                                 icon: Icon(Icons.remove),
                                 onPressed: item['quantity'] > 1
-                                  ? () {
-                                      setState(() {
-                                        Cart.decreaseQuantity(item['id']);
-                                      });
+                                  ? () async {
+                                      await Cart.decreaseQuantity(widget.userDetails.email, item['id']);
+                                      await _updateCart();
                                     }
-                                  : null,  // ปิดการใช้งานถ้าจำนวนสินค้าคือ 1
+                                  : null,
                               ),
-                              
-                              // การกรอกจำนวนสินค้า
                               SizedBox(
                                 width: 50,
                                 child: TextField(
                                   keyboardType: TextInputType.number,
                                   controller: TextEditingController(text: item['quantity'].toString()),
-                                  onChanged: (value) {
+                                  onChanged: (value) async {
                                     if (value.isNotEmpty && int.tryParse(value) != null) {
-                                      setState(() {
-                                        Cart.updateQuantity(item['id'], int.parse(value));
-                                      });
+                                      final int newQuantity = int.parse(value);
+                                      await Cart.updateQuantity(widget.userDetails.email, item['id'], newQuantity);
+                                      await _updateCart();
                                     }
                                   },
                                   textAlign: TextAlign.center,
@@ -86,26 +97,20 @@ class _Shpping_cardState extends State<Shpping_card> {
                                   ),
                                 ),
                               ),
-                              
-                              // ปุ่มเพิ่ม
                               IconButton(
                                 icon: Icon(Icons.add),
-                                onPressed: () {
-                                  setState(() {
-                                    Cart.increaseQuantity(item['id']);
-                                  });
+                                onPressed: () async {
+                                  await Cart.increaseQuantity(widget.userDetails.email, item['id']);
+                                  await _updateCart();
                                 },
                               ),
                             ],
                           ),
-                          Text('รวม: ${item['price'] * item['quantity']} ฿'),
-
-                          // ปุ่มลบรายการสินค้า
+                          Text('รวม: ${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
                           TextButton(
-                            onPressed: () {
-                              setState(() {
-                                Cart.removeItem(item['id']);
-                              });
+                            onPressed: () async {
+                              await Cart.removeItem(widget.userDetails.email, item['id']);
+                              await _updateCart();
                             },
                             child: Text('ลบรายการสินค้า', style: TextStyle(color: Colors.red)),
                           ),
@@ -145,10 +150,9 @@ class _Shpping_cardState extends State<Shpping_card> {
                               userDetails: widget.userDetails,
                             ),
                           ),
-                        ).then((_) {
-                          setState(() {
-                            Cart.clear(); // เคลียร์ตะกร้าหลังกลับจากหน้า buyproducts
-                          });
+                        ).then((_) async {
+                          await Cart.clear(widget.userDetails.email);
+                          await _updateCart();
                         });
                       },
                       icon: Icon(Icons.event_busy),
@@ -162,28 +166,3 @@ class _Shpping_cardState extends State<Shpping_card> {
     );
   }
 }
-
-Widget buildImage(String imageUrl, {double width = 50, double height = 50}) {
-  if (imageUrl.startsWith('/')) {
-    return Image.file(
-      File(imageUrl),
-      width: width,
-      height: height,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.broken_image);
-      },
-    );
-  } else {
-    return Image.asset(
-      imageUrl,
-      width: width,
-      height: height,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.broken_image);
-      },
-    );
-  }
-}
-
