@@ -113,16 +113,18 @@ class _ProductsListState extends State<ProductsList> {
     double screenHeight = MediaQuery.of(context).size.height;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F7F3),
+      backgroundColor: Color(0xFFf6f3ec),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+        backgroundColor: Color(0xFFf6f3ec),
+        automaticallyImplyLeading: false,
+        title: Text(
+          'My Products',
+          style: TextStyle(
+              fontSize: 30
+          )
         ),
-        title: const Text("My Products"),
         actions: [
-          OutlinedButton.icon(
+          ElevatedButton.icon(
             onPressed: () async {
               final result = await Navigator.push(
                 context,
@@ -134,8 +136,17 @@ class _ProductsListState extends State<ProductsList> {
                 _addProductFromMap(result);
               }
             },
-            icon: const Icon(Icons.add),
-            label: const Text('เพิ่มสินค้า'),
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text('เพิ่มสินค้า', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8D6E63), 
+              elevation: 6, 
+              shadowColor: Colors.brown.shade200,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12), 
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
           )
         ],
       ),
@@ -147,56 +158,64 @@ class _ProductsListState extends State<ProductsList> {
               ),
             )
           : ListView.builder(
-              itemCount: _products.length,
-              itemBuilder: (context, index) {
-                final product = _products[index];
-                return Container(
-                  height: screenHeight * 0.12,
-                  margin: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+        itemCount: _products.length,
+        itemBuilder: (context, index) {
+          final product = _products[index];
+          return Container(
+            height: screenHeight * 0.12,
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.4),
+                  spreadRadius: 2,
+                  blurRadius: 6,
+                  offset: const Offset(2, 3), 
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: product.imageUrl.startsWith('assets/')
+                        ? AssetImage(product.imageUrl) as ImageProvider
+                        : FileImage(File(product.imageUrl)),
                   ),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: product.imageUrl.startsWith('assets/')
-                              ? AssetImage(product.imageUrl) as ImageProvider
-                              : FileImage(File(product.imageUrl)),
-                        ),
-                      ),
-                      Expanded(child: Text(product.name)),
-                      Text('${product.price} ฿'),
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (c) => dialog_order(
-                              id: product.id,
-                              name: product.name,
-                              price: product.price,
-                              description: product.description,
-                              imageUrl: product.imageUrl,
-                              category: product.category,
-                              onSave: (updatedProduct) {
-                                _updateProduct(index, updatedProduct);
-                              },
-                              onDelete: (id) {
-                                _deleteProduct(index);
-                              },
-                            ),
-                          );
+                ),
+                Expanded(child: Text(product.name)),
+                Text('${product.price} ฿'),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (c) => dialog_order(
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        description: product.description,
+                        imageUrl: product.imageUrl,
+                        category: product.category,
+                        onSave: (updatedProduct) {
+                          _updateProduct(index, updatedProduct);
+                        },
+                        onDelete: (id) {
+                          _deleteProduct(index);
                         },
                       ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ],
             ),
+          );
+        },
+      )
     );
   }
 }

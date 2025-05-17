@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
 import 'package:sandy_roots/for_admin/detailproduct_admin.dart';
@@ -79,14 +80,6 @@ class _BuyerViewState extends State<BuyerView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F3),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text("Home"),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -94,29 +87,15 @@ class _BuyerViewState extends State<BuyerView> {
             children: [
               //------------------- banner ---------------------
               Container(
-                width: double.infinity,
-                height: screenHeight * 0.2,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/banner.jpg'),
-                    fit: BoxFit.cover,
-                  ),
+              width: double.infinity,
+              height: screenHeight * 0.3,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/banner2.png'),
+                  fit: BoxFit.cover,
                 ),
-                alignment: Alignment.bottomLeft,
-                padding: const EdgeInsets.all(16),
-                child: const Text.rich(
-                  TextSpan(
-                    text: 'Let Your Space\n',
-                    style: TextStyle(fontSize: 22, color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'Bloom.',
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              ),           
+            ),
 
               //------------- Search Box + Button ----------------------
               Padding(
@@ -137,20 +116,38 @@ class _BuyerViewState extends State<BuyerView> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        onChanged: (_) => setState(() {}),
+                        onChanged: (_) => _onSearch(),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 0),
                     ElevatedButton(
-                      onPressed: _onSearch,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFA8D5BA),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    onPressed: () {
+                      if (_searchController.text.isNotEmpty ) {
+                        // ล้างข้อมูล
+                        setState(() {
+                          _searchController.clear();
+              
+                          _filteredProducts = _products;
+                        });
+                      } else {
+                        // ค้นหา
+                        _onSearch();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFb7987c),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
                         ),
                       ),
-                      child: const Text('ค้นหา', style: TextStyle(color: Colors.black)),
                     ),
+                    child: (_searchController.text.isNotEmpty )
+                        ? const Icon(Icons.clear, color: Colors.white) // ล้าง
+                        : const Icon(Icons.search, color: Colors.white), // ค้นหา
+                  ),
                   ],
                 ),
               ),
@@ -192,7 +189,7 @@ class _BuyerViewState extends State<BuyerView> {
                     itemBuilder: (context, index) {
                       final product = _filteredProducts[index];
                       return Container(
-                        padding: const EdgeInsets.all(5),
+                        
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
@@ -201,7 +198,10 @@ class _BuyerViewState extends State<BuyerView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20)
+                                ),
                               child: product.imageUrl.startsWith('assets/')
                                   ? Image.asset(
                                       product.imageUrl,
@@ -216,54 +216,72 @@ class _BuyerViewState extends State<BuyerView> {
                                       fit: BoxFit.cover,
                                     ),
                             ),
-                            SizedBox(height: screenHeight * 0.001),
-                            Text(
-                              product.name, 
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              ),
-                              
-                            Text(
-                              product.description,
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(5, 5, 5, 1),
+                              child: Text(
+                                product.name, 
+                                style: GoogleFonts.notoSansThai(fontSize: 16,color: Colors.black),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                )
                             ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text('${product.price} ฿', style: const TextStyle(color: Colors.green, fontSize: 14)),
-                            SizedBox(height: screenHeight * 0.01),
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => Detailproduct_admin(
-                                      id: product.id,
-                                      name: product.name,
-                                      price: product.price,
-                                      description: product.description,
-                                      imageUrl: product.imageUrl,
-                                      category: product.category,
-                                    ))
+                            Padding(padding: EdgeInsets.fromLTRB(5, 1, 5, 2),
+                              child: Text(
+                                  product.description,
+                                  style: GoogleFonts.notoSansThai(fontSize: 12, color: Colors.grey),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(5, 2, 5, 5),
+                              child: Text('${product.price} ฿', 
+                                style: GoogleFonts.notoSansThai(
+                                  color: Color.fromARGB(255, 123, 131, 102), 
+                                  fontSize: 14
+                                ))),
+                            Spacer(),
+                            Padding(padding: EdgeInsets.all(5),
+                                        child: Center(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Detailproduct_admin(
+                                                    id: product.id,
+                                                    name: product.name,
+                                                    price: product.price,
+                                                    description: product.description,
+                                                    imageUrl: product.imageUrl,
+                                                    category: product.category,
+                                                    
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: const Color(0xFFf0ede4),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ),
+                                            child: Text('ดูรายละเอียด', 
+                                            style: GoogleFonts.notoSansThai(
+                                              fontSize: 12, 
+                                              color: Colors.black,
+                                            ))
+                                          ),
+                                        )),
+                                      ],
+                                    ),
                                   );
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFA8D5BA),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                child: const Text('ดูรายละเอียด', style: TextStyle(fontSize: 12, color: Colors.black)),
                               ),
                             ),
+                            SizedBox(height: screenHeight * 0.01) 
                           ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
         )
       ));
   }

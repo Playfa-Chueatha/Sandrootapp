@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 
@@ -91,23 +92,65 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
     }
   }
 
+
+  Color getStatusColor(String status) {
+    switch (status) {
+      case 'รอการจัดส่ง':
+        return const Color(0xFFD36E48);
+      case 'กำลังจัดส่ง':
+        return const Color(0xFFE1B382); 
+      case 'จัดส่งสำเร็จ':
+        return const Color(0xFF7A9E7E); 
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget buildStatusIcon(String status) {
+    final color = getStatusColor(status);
+    switch (status) {
+      case 'รอการจัดส่ง':
+        return Icon(Icons.access_time, color: color);
+      case 'กำลังจัดส่ง':
+        return Icon(Icons.local_shipping, color: color);
+      case 'จัดส่งสำเร็จ':
+        return Icon(Icons.check_circle, color: color);
+      default:
+        return Icon(Icons.help_outline, color: color);
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: Color(0xFFf6f3ec),
         appBar: AppBar(
-          // leading: IconButton(
-          //   icon: const Icon(Icons.arrow_back),
-          //   onPressed: () {
-          //     Navigator.pop(context, orders.isNotEmpty ? orders.last : null);
-          //   },
-          // ),
-          title: const Text('รายการคำสั่งซื้อ'),
-          backgroundColor: const Color(0xFFA8D5BA),
+          automaticallyImplyLeading: false,
+          title: Text(
+            'My Orders',
+            style: GoogleFonts.notoSansThai(
+              fontSize: 30
+            ),
+          ),
+          backgroundColor: Color(0xFFf6f3ec),
           bottom: TabBar(
             controller: _tabController,
-            tabs: const [
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(width: 4, color: Color(0xFFa98b72)),
+              insets: EdgeInsets.symmetric(horizontal: 10),
+            ),
+            indicatorWeight: 4,
+            indicatorColor: Color(0xFFa98b72),
+            labelColor: Colors.brown,
+            unselectedLabelColor: Colors.grey,
+            labelStyle: GoogleFonts.notoSansThai(fontSize: 18, fontWeight: FontWeight.bold),
+            unselectedLabelStyle: GoogleFonts.notoSansThai(fontSize: 16),
+            tabs: [
               Tab(text: 'รอการจัดส่ง'),
               Tab(text: 'กำลังจัดส่ง'),
               Tab(text: 'จัดส่งสำเร็จ'),
@@ -119,9 +162,18 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
             : TabBarView(
                 controller: _tabController,
                 children: [
-                  buildOrderList(filterOrdersByStatus("รอการจัดส่ง")),
-                  buildOrderList(filterOrdersByStatus("กำลังจัดส่ง")),
-                  buildOrderList(filterOrdersByStatus("จัดส่งสำเร็จ")),
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 500),
+                    child: buildOrderList(filterOrdersByStatus("รอการจัดส่ง")),
+                  ),
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 500),
+                    child: buildOrderList(filterOrdersByStatus("กำลังจัดส่ง")),
+                  ),
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 500),
+                    child: buildOrderList(filterOrdersByStatus("จัดส่งสำเร็จ")),
+                  ),
                 ],
               ),
       ),
@@ -134,10 +186,10 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
 
   Widget buildOrderList(List<dynamic> orderList) {
     if (orderList.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'ไม่มีคำสั่งซื้อ',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+          style: GoogleFonts.notoSansThai(fontSize: 16, color: Colors.grey),
         ),
       );
     }
@@ -151,30 +203,61 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
             setState(() {});
           }),
           child: Card(
-            margin: const EdgeInsets.all(8),
+            color: Colors.white,
+            margin: EdgeInsets.all(8),
+            elevation: 4,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
+                        style: GoogleFonts.notoSansThai(fontSize: 12, color:  Color.fromARGB(255, 107, 107, 107))),
+                      Row(
+                        children: [
+                          buildStatusIcon(order['status']),
+                          const SizedBox(width: 0),
+                          Text(
+                            order['status'],
+                            style: GoogleFonts.notoSansThai(
+                              color: getStatusColor(order['status']),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  
                   const SizedBox(height: 8),
-                  Text('สถานะ: ${order['status']}', style: const TextStyle(color: Colors.orange)),
-                  const SizedBox(height: 8),
-                  Text('ที่อยู่จัดส่ง: ${order['address']}', maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text('ที่อยู่จัดส่ง: ${order['address']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.notoSansThai(fontSize: 15)),
                   const SizedBox(height: 12),
-                  const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('รายการสินค้า:', style: GoogleFonts.notoSansThai(fontWeight: FontWeight.bold,fontSize: 16)),
                   const SizedBox(height: 6),
                   ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          Image.asset(item['imageUrl'], width: 40, height: 40),
+                          item['imageUrl'].startsWith('assets/')
+                          ? Image.asset(
+                              item['imageUrl'],
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(item['imageUrl']),
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                           const SizedBox(width: 10),
-                          Expanded(child: Text('${item['name']} (x${item['quantity']})')),
-                          Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
+                          Expanded(child: Text('${item['name']} (x${item['quantity']})',style: GoogleFonts.notoSansThai(fontSize: 14),)),
+                          Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿',style: GoogleFonts.notoSansThai(fontSize: 14)),
                         ],
                       ),
                     );
@@ -183,9 +266,9 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('ราคารวมทั้งหมด:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('ราคารวมทั้งหมด:', style: GoogleFonts.notoSansThai(fontWeight: FontWeight.bold,fontSize: 16)),
                       Text('${order['total'].toStringAsFixed(2)} ฿',
-                          style: const TextStyle(color: Colors.green)),
+                          style: GoogleFonts.notoSansThai(color: Color.fromARGB(255, 123, 131, 102),fontWeight: FontWeight.bold,fontSize: 16)),
                     ],
                   ),
                 ],
@@ -203,17 +286,20 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
         .fold(0, (sum, item) => item['quantity'] + sum);
 
     showDialog(
+      
       context: context,
       builder: (_) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          backgroundColor: Color(0xFFF9F9F9),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                Text('ที่อยู่: ${order['address']}'),
-                const SizedBox(height: 8),
+                        style: const TextStyle(fontSize: 12, color:  Color.fromARGB(255, 107, 107, 107))),
+                Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text('ที่อยู่จัดส่ง: ${order['address']}', maxLines: 4, overflow: TextOverflow.ellipsis, style: GoogleFonts.notoSansThai(fontSize: 15))),
                 const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
@@ -221,7 +307,19 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Row(
                       children: [
-                        Image.asset(item['imageUrl'], width: 30, height: 30),
+                        item['imageUrl'].startsWith('assets/')
+                          ? Image.asset(
+                              item['imageUrl'],
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(item['imageUrl']),
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                         const SizedBox(width: 8),
                         Expanded(child: Text('${item['name']} (x${item['quantity']})')),
                         Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
@@ -230,10 +328,32 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                   );
                 }),
                 const SizedBox(height: 10),
-                Text('จำนวนรวม: $totalItems ชิ้น'),
-                Text('ราคารวมทั้งหมด: ${order['total'].toStringAsFixed(2)} ฿'),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('จำนวนรวม: $totalItems ชิ้น'),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('ราคารวมทั้งหมด: ${order['total'].toStringAsFixed(2)} ฿'),
+                ),
                 const SizedBox(height: 12),
-                Text('สถานะ: ${order['status']}', style: const TextStyle(color: Colors.orange)),
+                Align(
+                  alignment:  Alignment.centerRight,
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          buildStatusIcon(order['status']),
+                          const SizedBox(width: 0),
+                          Text(
+                            order['status'],
+                            style: GoogleFonts.notoSansThai(
+                              color: getStatusColor(order['status']),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                ),
                 const SizedBox(height: 12),
                 
               ],
@@ -241,20 +361,28 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
           ),
           actions: [
             if (order['status'] == "กำลังจัดส่ง")
-              TextButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF8E9775),
+                  foregroundColor: Colors.white,
+                  elevation: 4, 
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), 
+                  ),
+                ),
                 onPressed: () {
                   final index = orders.indexOf(order);
                   if (index != -1) {
                     orders[index]['status'] = "จัดส่งสำเร็จ";
-                    saveOrders(orders); // อัปเดตสถานะในไฟล์ด้วย
+                    saveOrders(orders);
                   }
 
                   onStatusChanged();
                   Navigator.pop(context);
                 },
-                child: const Text('ได้รับสินค้าแล้ว',
-                    style: TextStyle(color: Color.fromARGB(255, 3, 27, 4))),
+                child: const Text('ได้รับสินค้าแล้ว'),
               ),
+
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('ปิด'),

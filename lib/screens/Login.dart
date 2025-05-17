@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/screens/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
-import 'package:sandy_roots/screens/AppBay_admin.dart';
+import 'package:sandy_roots/screens/AppBar_admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:sandy_roots/services/ShowUserJsonScreen%20.dart';
 

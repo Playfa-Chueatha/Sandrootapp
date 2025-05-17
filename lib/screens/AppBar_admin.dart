@@ -19,13 +19,6 @@ class _OrderScreenState extends State<ProductsScreen> {
   List<Product> products = [];
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const ProductsList(),
-    const Listorder(),
-    const BuyerView(),
-    const Myaccount(),
-  ];
-
   Future<void> productslist() async {
     try {
       final String response = await rootBundle.loadString('assets/data/Order.json');
@@ -46,30 +39,49 @@ class _OrderScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget currentPage;
+  switch (_currentIndex) {
+    case 0:
+      currentPage = ProductsList(
+        key: UniqueKey(),
+      );
+      break;
+    case 1:
+      currentPage = Listorder();
+      break;
+    case 2:
+      currentPage = BuyerView();
+      break;
+    case 3:
+      currentPage = Myaccount();
+      break;
+    default:
+      currentPage = ProductsList();
+  }
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: currentPage,
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
         currentIndex: _currentIndex,
-        backgroundColor:  Color(0xFFA8D5BA),
-        selectedItemColor: Color(0xFF657C55),
-        unselectedItemColor: Colors.black54,
+        selectedItemColor: const Color(0xFF8B6F4D),
+        unselectedItemColor: const Color.fromARGB(255, 0, 0, 0),
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.storefront),
-            label: 'จัดการสินค้า',
+            label: 'จัดการสินค้า',backgroundColor: Color(0xFFf6f3ec)
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'รายการสั่งซื้อ',
+            label: 'รายการสั่งซื้อ',backgroundColor: Color(0xFFf6f3ec)
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.visibility),
-            label: 'มุมมองผู้ซื้อ',
+            label: 'มุมมองผู้ซื้อ',backgroundColor: Color(0xFFf6f3ec)
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'บัญชีผู้ใช้',
+            label: 'บัญชีผู้ใช้',backgroundColor: Color(0xFFf6f3ec)
           ),
         ],
       ),

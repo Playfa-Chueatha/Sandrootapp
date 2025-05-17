@@ -30,7 +30,6 @@ class _DetailproductState extends State<Detailproduct_admin> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     
-
     
     Widget imageWidget;
     if (widget.imageUrl.startsWith('assets/')) {
@@ -50,17 +49,23 @@ class _DetailproductState extends State<Detailproduct_admin> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-                backgroundColor: const Color(0xFFA8D5BA),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
+      backgroundColor: Color(0xFFf6f3ec),
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              imageWidget,
+              Stack(
+                children: [
+                  imageWidget,
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),          
               Padding(
                 padding: EdgeInsets.fromLTRB(10,10,10,2),
                 child: Text(widget.name,style: TextStyle(
@@ -70,8 +75,8 @@ class _DetailproductState extends State<Detailproduct_admin> {
               Padding(padding: EdgeInsets.fromLTRB(10,3,10,5),
                 child:Text('${widget.price} ฿',
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.green
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 123, 131, 102), 
                   ),
                 ),
               ),             
@@ -95,8 +100,12 @@ class _DetailproductState extends State<Detailproduct_admin> {
                           SnackBar(content: Text('${widget.name} คุณกำลังอยู่ในมุมมองผู้ซื้อ')),
                         );
                       },
-                      icon: Icon(Icons.shopping_bag),
-                      label: Text('เพิ่มลงตระกร้า'),
+                      icon: Icon(Icons.add),style: ButtonStyle(
+                        iconColor: MaterialStateProperty.all<Color>(Colors.black),
+                      ),
+                      label: Text('เพิ่มลงตระกร้า',style: TextStyle(
+                        color: Colors.black
+                      ),),
                     ),
                     OutlinedButton.icon(
                       onPressed: () {
@@ -105,8 +114,14 @@ class _DetailproductState extends State<Detailproduct_admin> {
                           SnackBar(content: Text('${widget.name} คุณกำลังอยู่ในมุมมองผู้ซื้อ')),
                         );
                       },
-                      icon: Icon(Icons.event_busy),
-                      label: Text('สั่งซื้อสินค้า'),
+                      icon: Icon(Icons.shopping_bag),style: ButtonStyle(
+                        iconColor: MaterialStateProperty.all<Color>(Colors.black),
+                      ),
+                      label: Text('สั่งซื้อสินค้า',
+                      style: TextStyle(
+                          color: Colors.black
+                      )),
+                      
                     ),
                   ],
                 ),

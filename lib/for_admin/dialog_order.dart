@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
+import 'package:sandy_roots/services/category_provider.dart';
 
 class dialog_order extends StatefulWidget {
   final int id;
@@ -11,7 +12,7 @@ class dialog_order extends StatefulWidget {
   final String imageUrl;
   final String category;
   final void Function(Product updated) onSave;
-  final void Function(int id) onDelete;  // เพิ่ม callback ลบ
+  final void Function(int id) onDelete;  
 
   const dialog_order({
     super.key,
@@ -35,6 +36,10 @@ class _dialog_orderState extends State<dialog_order> {
   late final TextEditingController _descCtrl;
   late final TextEditingController _catCtrl;
   File? _imageFile;
+  String? selectedCategory;
+  TextEditingController searchCategoryCtrl = TextEditingController();
+  List<String> get categories => CategoryManager.instance.categories;
+
 
   @override
   void initState() {
@@ -43,6 +48,7 @@ class _dialog_orderState extends State<dialog_order> {
     _priceCtrl = TextEditingController(text: widget.price.toString());
     _descCtrl = TextEditingController(text: widget.description);
     _catCtrl = TextEditingController(text: widget.category);
+    selectedCategory = widget.category;
   }
 
   @override
@@ -64,11 +70,120 @@ class _dialog_orderState extends State<dialog_order> {
     }
   }
 
+  void _showCategorySelector() {
+  searchCategoryCtrl.clear();
+
+  final ScrollController scrollController = ScrollController();
+
+  showModalBottomSheet(
+    backgroundColor: const Color(0xFFf6f3ec),
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      List<String> filteredCategories = categories;
+
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final index = filteredCategories.indexOf(selectedCategory ?? '');
+        if (index >= 0 && scrollController.hasClients) {
+          scrollController.jumpTo(index * 56.0);
+        }
+      });
+
+      return StatefulBuilder(
+        builder: (context, setModalState) {
+          void filterCategories(String query) {
+            final filtered = categories.where((cat) =>
+              cat.toLowerCase().contains(query.toLowerCase())
+            ).toList();
+            setModalState(() {
+              filteredCategories = filtered;
+            });
+          }
+
+          void addNewCategory() {
+            final newCat = searchCategoryCtrl.text.trim();
+            if (newCat.isNotEmpty && !CategoryManager.instance.categories.contains(newCat)) {
+              setState(() {
+                CategoryManager.instance.addCategory(newCat);
+                selectedCategory = newCat;
+              });
+              Navigator.pop(context);
+            }
+          }
+
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              top: 16,
+              left: 16,
+              right: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: searchCategoryCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'ค้นหาหมวดหมู่ หรือ เพิ่มใหม่',
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: addNewCategory,
+                    ),
+                  ),
+                  onChanged: filterCategories,
+                ),
+                const SizedBox(height: 12),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  child: filteredCategories.isEmpty
+                      ? const Text('ไม่พบหมวดหมู่')
+                      : ListView.builder(
+                          controller: scrollController,
+                          itemCount: filteredCategories.length,
+                          itemBuilder: (context, index) {
+                            final cat = filteredCategories[index];
+                            final isSelected = cat == selectedCategory;
+
+                            return ListTile(
+                              title: Text(
+                                cat,
+                                style: TextStyle(
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color: isSelected ? Colors.brown : Colors.black,
+                                ),
+                              ),
+                              tileColor: isSelected ? Colors.brown.withOpacity(0.1) : null,
+                              onTap: () {
+                                setState(() {
+                                  selectedCategory = cat;
+                                });
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return AlertDialog(
-      title: const Text('แก้ไขสินค้า'),
+      backgroundColor: Color(0xFFf6f3ec),
+      title: const Text('Edit Products'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -114,38 +229,129 @@ class _dialog_orderState extends State<dialog_order> {
               ],
             ),
             SizedBox(height: screenHeight * 0.02),
-            TextFormField(
-              controller: _nameCtrl,
-              decoration: const InputDecoration(
-                labelText: 'ชื่อสินค้า',
-                border: OutlineInputBorder(),
+
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _nameCtrl,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: 'ชื่อสินค้า',
+                  hintText: 'ชื่อสินค้า',
+                  hintStyle: TextStyle(
+                          fontSize: 16,
+                        ),
+                ),
               ),
             ),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _priceCtrl,
-              decoration: const InputDecoration(
-                labelText: 'ราคา (฿)',
-                border: OutlineInputBorder(),
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-              keyboardType: TextInputType.number,
+              child: TextField(
+                controller: _priceCtrl,
+                decoration: InputDecoration(
+                  labelText: 'ราคา',
+                  border: InputBorder.none,
+                  hintText: 'ราคา (฿)',
+                  hintStyle: TextStyle(
+                          fontSize: 16,
+                        ),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _catCtrl,
-              decoration: const InputDecoration(
-                labelText: 'หมวดหมู่',
-                border: OutlineInputBorder(),
+
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: InkWell(
+                onTap: _showCategorySelector,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      selectedCategory ?? 'เลือกหมวดหมู่',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: selectedCategory == null ? Colors.grey : Colors.black,
+                      ),
+                    ),
+                    const Icon(Icons.arrow_drop_down),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _descCtrl,
-              decoration: const InputDecoration(
-                labelText: 'รายละเอียด',
-                border: OutlineInputBorder(),
+            
+
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-              maxLines: 3,
+              child: TextField(
+                controller: _descCtrl,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'รายละเอียด',
+                  hintStyle: TextStyle(
+                          fontSize: 16,
+                        ),
+                ),
+                maxLines: 3,
+              ),
             ),
           ],
         ),
@@ -164,7 +370,7 @@ class _dialog_orderState extends State<dialog_order> {
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('ยกเลิก'),
+          child: const Text('ยกเลิก',style: TextStyle(color: Colors.black),),
         ),
         ElevatedButton(
           onPressed: () {
@@ -174,12 +380,12 @@ class _dialog_orderState extends State<dialog_order> {
               price: int.tryParse(_priceCtrl.text) ?? widget.price,
               description: _descCtrl.text,
               imageUrl: _imageFile?.path ?? widget.imageUrl,
-              category: _catCtrl.text,
+              category: selectedCategory ?? '',
             );
             widget.onSave(updated);
             Navigator.of(context).pop();
           },
-          child: const Text('บันทึก'),
+          child: const Text('บันทึก',style: TextStyle(color: Colors.green),),
         ),
       ],
     );

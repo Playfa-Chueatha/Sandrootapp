@@ -58,6 +58,7 @@ class _AddProductPageState extends State<AddProductPage> {
     searchCategoryCtrl.clear();
 
     showModalBottomSheet(
+      backgroundColor: Color(0xFFf6f3ec),
       context: context,
       isScrollControlled: true,
       builder: (context) {
@@ -188,15 +189,21 @@ class _AddProductPageState extends State<AddProductPage> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFA8D5BA),
+      backgroundColor: Color(0xFFf6f3ec),
+      appBar: AppBar(  
+        backgroundColor: Color(0xFFf6f3ec),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_rounded, color: Color.fromARGB(255, 0, 0, 0)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text("Add Product"),
+        title: Text(
+          'Add Products',
+          style: TextStyle(
+              fontSize: 30
+          )),
         actions: [
           // IconButton(
           //     icon: const Icon(Icons.list),
@@ -226,14 +233,14 @@ class _AddProductPageState extends State<AddProductPage> {
                   child: _imageFile != null
                       ? Image.file(
                           _imageFile!,
-                          height: 80,
-                          width: 80,
+                          height: 100,
+                          width: 100,
                           fit: BoxFit.cover,
                         )
                       : Image.asset(
                           'assets/images/default_sandyroot.png',
-                          height: 80,
-                          width: 80,
+                          height: 100,
+                          width: 100,
                           fit: BoxFit.cover,
                         ),
                 ),
@@ -257,55 +264,126 @@ class _AddProductPageState extends State<AddProductPage> {
               ],
             ),
             SizedBox(height: screenHeight * 0.05),
-            TextFormField(
-              controller: _nameCtrl,
-              decoration: const InputDecoration(
-                labelText: 'ชื่อสินค้า',
-                border: OutlineInputBorder(),
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _priceCtrl,
-              decoration: const InputDecoration(
-                labelText: 'ราคา (฿)',
-                border: OutlineInputBorder(),
+              child: TextField(
+                controller: _nameCtrl,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'ชื่อสินค้า',
+                  hintStyle: TextStyle(
+                          fontSize: 16,
+                        ),
+                ),
               ),
-              keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 12),
 
-            
-            InkWell(
-              onTap: _showCategorySelector,
-              child: InputDecorator(
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _priceCtrl,
                 decoration: InputDecoration(
-                  labelText: 'หมวดหมู่',
-                  border: OutlineInputBorder(),
+                  border: InputBorder.none,
+                  hintText: 'ราคา (฿)',
+                  hintStyle: TextStyle(
+                          fontSize: 16,
+                        ),
                 ),
+              ),
+            ),
+            const SizedBox(height: 12),
+           
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec), 
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: InkWell(
+                onTap: _showCategorySelector,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       selectedCategory ?? 'เลือกหมวดหมู่',
                       style: TextStyle(
+                        fontSize: 16,
                         color: selectedCategory == null ? Colors.grey : Colors.black,
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down),
+                    const Icon(Icons.arrow_drop_down),
                   ],
                 ),
               ),
             ),
-
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _descCtrl,
-              decoration: const InputDecoration(
-                labelText: 'รายละเอียด',
-                border: OutlineInputBorder(),
+
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-              maxLines: 3,
+              child: TextField(
+                controller: _descCtrl,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'รายละเอียด',
+                  hintStyle: TextStyle(
+                          fontSize: 16,
+                        ),
+                ),
+                maxLines: 3,
+              ),
             ),
           ],
         ),

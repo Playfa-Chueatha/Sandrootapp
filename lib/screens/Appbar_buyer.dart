@@ -65,7 +65,7 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
 
   @override
 Widget build(BuildContext context) {
-    Widget currentPage;
+  Widget currentPage;
   switch (_currentIndex) {
     case 0:
       currentPage = HomeScreen(
@@ -106,8 +106,7 @@ Widget build(BuildContext context) {
     body: currentPage,
     bottomNavigationBar: BottomNavigationBar(
       type: BottomNavigationBarType.shifting,
-      currentIndex: _currentIndex,
-      
+      currentIndex: _currentIndex, 
       selectedItemColor: const Color(0xFF8B6F4D),
       unselectedItemColor: const Color.fromARGB(255, 0, 0, 0),
       onTap: (index) {

@@ -35,7 +35,6 @@ class _buyproductsState extends State<buyproducts> {
   String? selectedSubdistrict;
   String zipcode = '';
 
-  // เพิ่มตัวแปร orders เพื่อเก็บรายการสั่งซื้อ
   List<Map<String, dynamic>> orders = [];
 
   Future<void> loadAddressData() async {

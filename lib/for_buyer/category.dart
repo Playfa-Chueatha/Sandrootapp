@@ -45,11 +45,19 @@ class _categoryState extends State<category> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFA8D5BA),
-        title: const Text("Category"),
+        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFFf6f3ec),
+        title: Text(     
+            'Categoly',
+            style: GoogleFonts.notoSansThai(
+              fontSize: 30
+            ),
+          ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Container(

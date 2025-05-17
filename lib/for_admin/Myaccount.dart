@@ -10,22 +10,24 @@ class Myaccount extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F3),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text("บัญชีของฉัน"),
+        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFFf6f3ec),
+        title: Text(     
+            'My account',
+            style: TextStyle(
+              fontSize: 30
+            ),
+          ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             
-            CircleAvatar(
-                radius: 60,
-                backgroundImage: const AssetImage('assets/images/default_sandyroot.png') as ImageProvider,
-            ),
+            // CircleAvatar(
+            //     radius: 60,
+            //     backgroundImage: const AssetImage('assets/images/default_sandyroot.png') as ImageProvider,
+            // ),
                           
             const SizedBox(height: 20),
             ListTile(
