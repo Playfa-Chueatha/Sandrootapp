@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 
@@ -70,130 +71,262 @@ class _buyproductsState extends State<buyproducts> {
   
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F7F3),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFA8D5BA),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text("ยืนยันการสั่งซื้อ"),
-      ),
+      backgroundColor: Color(0xFFf6f3ec),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
+        child: Column(      
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('ที่อยู่จัดส่ง', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            TextField(
-              controller: houseNoController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'บ้านเลขที่/หมู่ที่',
-                labelText: 'บ้านเลขที่',
-              ),
-              onChanged: (value) => updateFullAddress(),
-            ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_rounded),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Text('')
 
+              ],
+            ),  
+            const SizedBox(height: 20),
+            Padding(padding: EdgeInsets.fromLTRB(5,10,5,5),
+            child: Text('ที่อยู่จัดส่ง', style: GoogleFonts.notoSansThai(fontSize: 18))),
+       
+            // บ้านเลขที่/หมู่ที่
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: houseNoController,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'บ้านเลขที่/หมู่ที่',
+                  hintStyle: GoogleFonts.notoSansThai(
+                          fontSize: 16,
+                        ),
+                ),
+                onChanged: (value) => updateFullAddress(),
+              ),
+            ),
             const SizedBox(height: 10),
 
             // จังหวัด
-            DropdownButton<String>(
-              hint: const Text('เลือกจังหวัด'),
-              value: selectedProvince,
-              items: provinces.map<DropdownMenuItem<String>>((province) {
-                return DropdownMenuItem<String>(
-                  value: province['province'],
-                  child: Text(province['province']),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedProvince = value;
-                  selectedDistrict = null;
-                  selectedSubdistrict = null;
-                  zipcode = '';
-                  districts = provinces.firstWhere((p) => p['province'] == value)['districts'];
-                  subdistricts = [];
-                });
-                updateFullAddress();
-              },
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFf6f3ec)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFf6f3ec)),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  isExpanded: true,
+                  hint: Text('เลือกจังหวัด',style: GoogleFonts.notoSansThai(fontSize: 16)),
+                  value: selectedProvince,
+                  items: provinces.map<DropdownMenuItem<String>>((province) {
+                    return DropdownMenuItem<String>(
+                      value: province['province'],
+                      child: Text(province['province']),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedProvince = value;
+                      selectedDistrict = null;
+                      selectedSubdistrict = null;
+                      zipcode = '';
+                      districts = provinces
+                          .firstWhere((p) => p['province'] == value)['districts'];
+                      subdistricts = [];
+                    });
+                    updateFullAddress();
+                  },
+                ),
+              ),
             ),
             const SizedBox(height: 10),
 
             // อำเภอ
-            DropdownButtonFormField<String>(
-              value: selectedDistrict,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'อำเภอ',
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-              items: districts.map<DropdownMenuItem<String>>((district) {
-                return DropdownMenuItem<String>(
-                  value: district['name'],
-                  child: Text(district['name']),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedDistrict = value;
-                  selectedSubdistrict = null;
-                  final district = districts.firstWhere((d) => d['name'] == value);
-                  subdistricts = district['subdistricts'];
-                  zipcode = '';
-                });
-                updateFullAddress();
-              },
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFf6f3ec)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFf6f3ec)),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  isExpanded: true,
+                  hint: Text('เลือกอำเภอ',style: GoogleFonts.notoSansThai(fontSize: 16)),
+                  value: selectedDistrict,
+                  items: districts.map<DropdownMenuItem<String>>((district) {
+                    return DropdownMenuItem<String>(
+                      value: district['name'],
+                      child: Text(district['name']),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDistrict = value;
+                      selectedSubdistrict = null;
+                      final district = districts
+                          .firstWhere((d) => d['name'] == value);
+                      subdistricts = district['subdistricts'];
+                      zipcode = '';
+                    });
+                    updateFullAddress();
+                  },
+                ),
+              ),
             ),
+
             const SizedBox(height: 10),
 
             // ตำบล
-            DropdownButtonFormField<String>(
-              value: selectedSubdistrict,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'ตำบล',
+            Container(
+              width: screenWidth * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf6f3ec),
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-              items: subdistricts.map<DropdownMenuItem<String>>((subdistrict) {
-                return DropdownMenuItem<String>(
-                  value: subdistrict['name'],
-                  child: Text(subdistrict['name']),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedSubdistrict = value;
-                  final district = districts.firstWhere((d) => d['name'] == selectedDistrict);
-                  final sub = district['subdistricts'].firstWhere((s) => s['name'] == value);
-                  zipcode = sub['zipcode'];
-                });
-                updateFullAddress();
-              },
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFf6f3ec)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFf6f3ec)),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  isExpanded: true,
+                  hint: Text('เลือกตำบล',style: GoogleFonts.notoSansThai(fontSize: 16)),
+                  value: selectedSubdistrict,
+                  items: subdistricts.map<DropdownMenuItem<String>>((subdistrict) {
+                    return DropdownMenuItem<String>(
+                      value: subdistrict['name'],
+                      child: Text(subdistrict['name']),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSubdistrict = value;
+                      final district = districts.firstWhere((d) => d['name'] == selectedDistrict);
+                      final sub = district['subdistricts'].firstWhere((s) => s['name'] == value);
+                      zipcode = sub['zipcode'];
+                    });
+                    updateFullAddress();
+                  },
+                )
+              ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
 
             // แสดงรหัสไปรษณีย์
-            Text('รหัสไปรษณีย์: $zipcode', style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 20),
-            const Text('รายการสินค้า', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('รหัสไปรษณีย์: $zipcode', style: GoogleFonts.notoSansThai(fontSize: 16)),
+            SizedBox(height: 20),
+            Text('รายการสินค้า', style: GoogleFonts.notoSansThai(fontSize: 18, fontWeight: FontWeight.bold)),
             ...widget.cartItems.map((item) => ListTile(
               leading: buildImage(item['imageUrl']),
-              title: Text(item['name']),
-              subtitle: Text('จำนวน ${item['quantity']} | รวม ${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
+              title: Text(item['name'], style: GoogleFonts.notoSansThai(fontSize: 16)),
+              subtitle: Text('จำนวน ${item['quantity']} | รวม ${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿', style: GoogleFonts.notoSansThai(fontSize: 14)),
             )),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('ราคารวมทั้งหมด:', style: TextStyle(fontSize: 18)),
-                Text('${widget.total.toStringAsFixed(2)} ฿', style: const TextStyle(fontSize: 18, color: Colors.green)),
-              ],
+            Divider(
+              color: Colors.grey,
+              thickness: 1,  
+              indent: 10,    
+              endIndent: 10,
+            ),
+            Padding(padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('ราคารวมทั้งหมด:', style: GoogleFonts.notoSansThai(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold
+                  )),
+                  Text('${widget.total.toStringAsFixed(2)} ฿', 
+                  style: GoogleFonts.notoSansThai(
+                    fontSize: 18, 
+                    color: Color.fromARGB(255, 123, 131, 102), 
+                    fontWeight: FontWeight.bold
+                  )),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFc3a68e),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 8,  
+                  shadowColor: Colors.brown.withOpacity(0.5), 
+                ),
                 onPressed: () {
                   if (addressController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -201,8 +334,6 @@ class _buyproductsState extends State<buyproducts> {
                     );
                     return;
                   }
-
-
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -214,13 +345,21 @@ class _buyproductsState extends State<buyproducts> {
                           'address': addressController.text,
                           'status': 'รอการจัดส่ง',
                           'orderNumber': 'ORD-${DateTime.now().millisecondsSinceEpoch}'
-                        }, userDetails: widget.userDetails, 
+                        }, userDetails: widget.userDetails,
                       ),
                     ),
                   );
-
                 },
-                child: const Text('ยืนยันการสั่งซื้อ'),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'ยืนยันการสั่งซื้อ',
+                    style: GoogleFonts.notoSansThai(
+                      fontSize: 18,
+                      color: Color(0xFF7B5E57),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -256,3 +395,4 @@ Widget buildImage(String imageUrl) {
     );
   }
 }
+

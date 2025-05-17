@@ -55,7 +55,7 @@ class _AppbarBuyerState extends State<AppbarBuyer> {
   @override
   void didUpdateWidget(covariant AppbarBuyer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // ถ้าค่า selectedCategory จาก prop มีการเปลี่ยนแปลง ให้ update state ด้วย
+    
     if (widget.selectedCategory != oldWidget.selectedCategory) {
       setState(() {
         _selectedCategory = widget.selectedCategory;
@@ -105,25 +105,26 @@ Widget build(BuildContext context) {
   return Scaffold(
     body: currentPage,
     bottomNavigationBar: BottomNavigationBar(
+      type: BottomNavigationBarType.shifting,
       currentIndex: _currentIndex,
-      backgroundColor: const Color(0xFFA8D5BA),
-      selectedItemColor: const Color(0xFF657C55),
-      unselectedItemColor: Colors.black54,
+      
+      selectedItemColor: const Color(0xFF8B6F4D),
+      unselectedItemColor: const Color.fromARGB(255, 0, 0, 0),
       onTap: (index) {
         setState(() {
           _currentIndex = index;
 
           if (index == 0) {
-            _selectedCategory = null; // รีเซตค่าเมื่อกลับหน้าโฮม
+            _selectedCategory = null; 
           }
         });
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก'),
-        BottomNavigationBarItem(icon: Icon(Icons.category), label: 'หมวดหมู่'),
-        BottomNavigationBarItem(icon: Icon(Icons.list), label: 'รายการสั่งซื้อ'),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'ตระกร้า'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'บัญชีผู้ใช้'),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(Icons.category), label: 'หมวดหมู่',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(Icons.list), label: 'รายการสั่งซื้อ',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'ตระกร้า',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'บัญชีผู้ใช้',backgroundColor: Color(0xFFf6f3ec)),
       ],
     ),
   );

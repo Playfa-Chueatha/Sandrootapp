@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sandy_roots/Data/data_user.dart';
-import 'package:sandy_roots/forgetpass.dart';
+import 'package:sandy_roots/screens/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBay_admin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:sandy_roots/services/ShowUserJsonScreen%20.dart';
 
 class Mainlogin extends StatefulWidget {
@@ -127,6 +128,7 @@ class _Login extends StatefulWidget {
 class __LoginState extends State<_Login> {
   final _formKey = GlobalKey<FormState>();
   final usernameOrEmailController = TextEditingController();
+  bool rememberMe = false;
   
 
 
@@ -144,11 +146,15 @@ class __LoginState extends State<_Login> {
 
   
 
-  void loginUser() {
+  Future<void> loginUser() async {
     String email = usernameOrEmailController.text.trim();
     String password = passwordController.text;
 
-    if (dataUser.login(email, password)) {
+    await widget.userManager.loadUsers();
+
+    if (widget.userManager.login(email, password)) {
+      await saveLoginStatus(); 
+      UserProfile userProfile = widget.userManager.getUserProfile(email, password)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("เข้าสู่ระบบสำเร็จ"),
@@ -156,8 +162,6 @@ class __LoginState extends State<_Login> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      // นำข้อมูลจาก UserProfile มาใช้ในที่นี้
-      UserProfile userProfile = dataUser.getUserProfile(email, password)!;  // สมมติว่า getUserProfile() ส่งคืน UserProfile
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => AppbarBuyer(userDetails: userProfile)),
@@ -174,6 +178,17 @@ class __LoginState extends State<_Login> {
   }
 
 
+  Future<void> saveLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+  }
+
+  Future<void> clearLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('isLoggedIn');
+  }
+
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -187,56 +202,72 @@ class __LoginState extends State<_Login> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
-                controller: usernameOrEmailController,
-                decoration: InputDecoration(
-                  hintText: 'Username or Email',
-                  prefixIcon: Icon(Icons.person),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none,
+              SizedBox(height: screenHeight * 0.03),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.75,
+                height: 60,
+                child: TextFormField(
+                  controller: usernameOrEmailController,
+                  decoration: InputDecoration(
+                    hintText: 'Username or Email',
+                    prefixIcon: Icon(Icons.person),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกชื่อผู้ใช้หรืออีเมล';
-                  }
-                  return null;
-                },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกชื่อผู้ใช้หรืออีเมล';
+                    }
+                    return null;
+                  },
+                )
               ),
               SizedBox(height: screenHeight * 0.02),
-              TextFormField(
-                controller: passwordController,
-                obscureText: _isObscurd,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: IconButton(
-                    icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () {
-                      setState(() {
-                        _isObscurd = !_isObscurd;
-                      });
-                    },
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.75,
+                height: 60,
+                child:TextFormField(
+                  controller: passwordController,
+                  obscureText: _isObscurd,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    prefixIcon: Icon(Icons.lock),
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _isObscurd = !_isObscurd;
+                        });
+                      },
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกรหัสผ่าน';
-                  }
-                  return null;
-                },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกรหัสผ่าน';
+                    }
+                    return null;
+                  },
+                )
               ),
-              SizedBox(height: screenHeight * 0.07),
+              SizedBox(height: screenHeight * 0.04),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF8B5E3C),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     String useroremail = usernameOrEmailController.text.trim();
@@ -255,7 +286,7 @@ class __LoginState extends State<_Login> {
                         MaterialPageRoute(builder: (context) => ProductsScreen()),
                       );
                     } else {
-                      await widget.userManager.loadUsers(); // ✅ รอให้โหลดเสร็จก่อน
+                      await widget.userManager.loadUsers(); 
                       bool success = widget.userManager.login(useroremail, password);
 
                       if (success) {
@@ -287,8 +318,9 @@ class __LoginState extends State<_Login> {
                     }
                   }
                 },
-                child: Text('Login'),
+                child: Text('Login', style: TextStyle(color: Colors.white)),
               ),
+              Spacer(),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -477,136 +509,154 @@ bool isValidUsername(String username) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+
+
                 // Email
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.email),
-                    hintText: 'Email',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: 60,
+                  child: TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.email),
+                      hintText: 'Email',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณากรอกอีเมล';
-                    } else if (!isValidEmail(value)) {
-                      return 'กรุณากรอกเฉพาะ @gmail.com หรือ @hotmail.com';
-                    }
-                    return null;
-                  },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณากรอกอีเมล';
+                      } else if (!isValidEmail(value)) {
+                        return 'กรุณากรอกเฉพาะ @gmail.com หรือ @hotmail.com';
+                      }
+                      return null;
+                    },
+                  )
                 ),
                 SizedBox(height: screenHeight * 0.02),
 
                 // Username
-                TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person),
-                    hintText: 'Username',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: 60,
+                  child: TextFormField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      hintText: 'Username',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณากรอกชื่อผู้ใช้';
+                      }
+
+                      final trimmed = value.trim();
+
+                      
+                      if (RegExp(r'[\u0E00-\u0E7F]').hasMatch(trimmed)) {
+                        return 'ไม่อนุญาตให้กรอกภาษาไทย';
+                      }
+
+                      
+                      if (!RegExp(r'^[a-zA-Z0-9\-_.@]+$').hasMatch(trimmed)) {
+                        return 'ชื่อผู้ใช้สามารถประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวเลข และ . - _ @ เท่านั้น';
+                      }
+
+                      
+                      if (trimmed.length < 4) {
+                        return 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 4 ตัวอักษร';
+                      }
+
+                      
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณากรอกชื่อผู้ใช้';
-                    }
-
-                    final trimmed = value.trim();
-
-                    
-                    if (RegExp(r'[\u0E00-\u0E7F]').hasMatch(trimmed)) {
-                      return 'ไม่อนุญาตให้กรอกภาษาไทย';
-                    }
-
-                    
-                    if (!RegExp(r'^[a-zA-Z0-9\-_.@]+$').hasMatch(trimmed)) {
-                      return 'ชื่อผู้ใช้สามารถประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวเลข และ . - _ @ เท่านั้น';
-                    }
-
-                    
-                    if (trimmed.length < 4) {
-                      return 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 4 ตัวอักษร';
-                    }
-
-                    
-                    return null;
-                  },
                 ),
                 SizedBox(height: screenHeight * 0.02),
 
                 // Password
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: _isObscurd,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.lock),
-                    hintText: 'Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    suffixIcon: IconButton(
-                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _isObscurd = !_isObscurd;
-                        });
-                      },
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: 60,
+                  child: TextFormField(
+                    controller: passwordController,
+                    obscureText: _isObscurd,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                      hintText: 'Password',
+                      filled: true,
+                      fillColor: Colors.white,
+                      suffixIcon: IconButton(
+                        icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _isObscurd = !_isObscurd;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณากรอกรหัสผ่าน';
+                      } else if (!isValidPassword(value)) {
+                        return 'รหัสผ่านต้องมีอย่างน้อย 5 ตัวอักษร';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณากรอกรหัสผ่าน';
-                    } else if (!isValidPassword(value)) {
-                      return 'รหัสผ่านต้องมีอย่างน้อย 5 ตัวอักษร';
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: screenHeight * 0.02),
 
                 // Confirm Password
-                TextFormField(
-                  controller: confirmPasswordController,
-                  obscureText: _isObscurd2,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.lock),
-                    hintText: 'Confirm Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    suffixIcon: IconButton(
-                      icon: Icon(_isObscurd2 ? Icons.visibility_off : Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _isObscurd2 = !_isObscurd2;
-                        });
-                      },
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: 60,
+                  child: TextFormField(
+                    controller: confirmPasswordController,
+                    obscureText: _isObscurd2,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                      hintText: 'Confirm Password',
+                      filled: true,
+                      fillColor: Colors.white,
+                      suffixIcon: IconButton(
+                        icon: Icon(_isObscurd2 ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _isObscurd2 = !_isObscurd2;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณากรอกยืนยันรหัสผ่าน';
+                      } else if (value != passwordController.text) {
+                        return 'รหัสผ่านไม่ตรงกัน';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณากรอกยืนยันรหัสผ่าน';
-                    } else if (value != passwordController.text) {
-                      return 'รหัสผ่านไม่ตรงกัน';
-                    }
-                    return null;
-                  },
                 ),
-                SizedBox(height: screenHeight * 0.07),
+                SizedBox(height: screenHeight * 0.06),
 
                 // Register Button
                 ElevatedButton(

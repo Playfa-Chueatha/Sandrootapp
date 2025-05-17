@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sandy_roots/Data/data_shoppingCart.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/for_buyer/buyproducts.dart';
@@ -35,6 +36,7 @@ class _DetailproductState extends State<Detailproduct> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     Cart.getItems(widget.userDetails.email);
     Cart.getTotalPrice(widget.userDetails.email);
 
@@ -58,28 +60,35 @@ class _DetailproductState extends State<Detailproduct> {
 
     
     return Scaffold(
-      appBar: AppBar(
-                backgroundColor: const Color(0xFFA8D5BA),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
+      backgroundColor: Color(0xFFf6f3ec),
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              imageWidget,
+              Stack(
+                children: [
+                  imageWidget,
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),          
               Padding(
                 padding: EdgeInsets.fromLTRB(10,10,10,2),
-                child: Text(widget.name,style: TextStyle(
-                fontSize: 20,
-                color: Colors.black
-              ))),
+                child: Text(widget.name,
+                style: GoogleFonts.notoSansThai(
+                  fontSize: 20,
+                  color: Colors.black
+                ))),
               Padding(padding: EdgeInsets.fromLTRB(10,3,10,5),
                 child:Text('${widget.price} ฿',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.green
+                  style: GoogleFonts.notoSansThai(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 123, 131, 102), 
                   ),
                 ),
               ),             
@@ -87,7 +96,10 @@ class _DetailproductState extends State<Detailproduct> {
                 child: Container(
                   padding: EdgeInsets.all(20),
                   child: SingleChildScrollView(
-                    child: Text(widget.description),
+                    child: Text(widget.description,style: GoogleFonts.notoSansThai(
+                      fontSize: 16,
+                      color: Colors.black
+                    )),
                   ), 
                 )
               ),
@@ -118,9 +130,14 @@ class _DetailproductState extends State<Detailproduct> {
                           SnackBar(content: Text('${widget.name} ถูกเพิ่มลงในตะกร้าแล้ว')),
                         );
                       },
-                      icon: Icon(Icons.shopping_bag),
-                      label: Text('เพิ่มลงตระกร้า'),
+                      icon: Icon(Icons.add),style: ButtonStyle(
+                        iconColor: MaterialStateProperty.all<Color>(Colors.black),
+                      ),
+                      label: Text('เพิ่มลงตระกร้า',style: GoogleFonts.notoSansThai(
+                        color: Colors.black
+                      ),),
                     ),
+                    SizedBox(width:screenWidth * 0.01),
                     OutlinedButton.icon(
                       onPressed: () {
                         
@@ -145,8 +162,14 @@ class _DetailproductState extends State<Detailproduct> {
                           ),
                         );
                       },
-                      icon: Icon(Icons.event_busy),
-                      label: Text('สั่งซื้อสินค้า'),
+                      icon: Icon(Icons.shopping_bag),style: ButtonStyle(
+                        iconColor: MaterialStateProperty.all<Color>(Colors.black),
+                      ),
+                      label: Text('สั่งซื้อสินค้า',
+                      style: GoogleFonts.notoSansThai(
+                          color: Colors.black
+                        )
+                      ),
                     ),
                   ],
                 ),
