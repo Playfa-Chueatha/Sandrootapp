@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sandy_roots/services/CategoryListPage.dart';
 // import 'package:sandy_roots/services/CategoryListPage.dart';
 import 'package:sandy_roots/services/category_provider.dart';
 
@@ -75,19 +77,6 @@ class _AddProductPageState extends State<AddProductPage> {
                 filteredCategories = filtered;
               });
             }
-
-            void addNewCategory() {
-              final newCat = searchCategoryCtrl.text.trim();
-              if (newCat.isNotEmpty && !CategoryManager.instance.categories.contains(newCat)) {
-                setState(() {
-                  CategoryManager.instance.addCategory(newCat);
-                  selectedCategory = newCat;
-                });
-                Navigator.pop(context);
-              }
-            }
-
-
             return Padding(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -101,11 +90,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   TextField(
                     controller: searchCategoryCtrl,
                     decoration: InputDecoration(
-                      labelText: 'ค้นหาหมวดหมู่ หรือ เพิ่มใหม่',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: addNewCategory,
-                      ),
+                      labelText: 'ค้นหาหมวดหมู่',
                     ),
                     onChanged: filterCategories,
                   ),
@@ -205,30 +190,6 @@ class _AddProductPageState extends State<AddProductPage> {
   });
 }
 
-
-  Future<void> addNewCategory() async {
-    final newCat = searchCategoryCtrl.text.trim();
-
-    
-    if (newCat.isNotEmpty && !CategoryManager.instance.categories.contains(newCat)) {      
-      await CategoryManager.instance.addCategory(newCat);
-
-      
-      setState(() {
-        selectedCategory = newCat;
-      });
-
-      
-      Navigator.pop(context);
-    }
-  }
-
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -248,18 +209,9 @@ class _AddProductPageState extends State<AddProductPage> {
               fontSize: 30
           )),
         actions: [
-          // IconButton(
-          //     icon: const Icon(Icons.list),
-          //     tooltip: 'ดูหมวดหมู่ทั้งหมด',
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(builder: (_) => const CategoryListPage()),
-          //       );
-          //     },
-          //   ),
+      
           IconButton(
-            icon: const Icon(Icons.check),
+            icon: Icon(FontAwesomeIcons.check, color: Colors.green),
             onPressed: _saveProduct,
           )
         ],
@@ -441,9 +393,28 @@ class _AddProductPageState extends State<AddProductPage> {
                 maxLines: 3,
               ),
             ),
+            SizedBox(height: 10),
+             Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(
+                      builder: (context) => CategoryListPage()
+                    )
+                  );
+                },
+                icon: FaIcon(FontAwesomeIcons.gear, color: Colors.black),
+                label: Text('จัดการหมวดหมู่', style: TextStyle(color: Colors.black)),
+              ),
+            ),
           ],
-            )))])
-      
+            )
+            )
+          )
+        ]
+      )    
     );
   }
 }

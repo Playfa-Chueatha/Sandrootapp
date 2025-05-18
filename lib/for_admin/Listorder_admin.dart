@@ -15,6 +15,7 @@ class Listorder extends StatefulWidget {
 class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
   List<dynamic> orders = [];
   late TabController _tabController;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
         final jsonString = await file.readAsString();
         setState(() {
           orders = jsonDecode(jsonString);
+          isLoading = false;
         });
       } else {
         
@@ -42,11 +44,13 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
         await file.writeAsString(jsonData);
         setState(() {
           orders = jsonDecode(jsonData);
+          isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
         orders = [];
+        isLoading = false;
       });
     }
   }
@@ -333,7 +337,7 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
             ],
           ),
         ),
-        body: orders.isEmpty
+        body: isLoading
             ? const Center(child: CircularProgressIndicator())
             : TabBarView(
                 controller: _tabController,

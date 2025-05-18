@@ -43,6 +43,12 @@ dependencies:
   shared_preferences: ^2.0.15
   google_fonts: ^6.1.0
   animations: ^2.0.11
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
  
 
 dev_dependencies:
@@ -66,6 +72,7 @@ flutter:
     - assets/data/Products.json
     - assets/data/users.json
     - assets/data/thai_address.json
+    - assets/images/logosandroots.png
     
 
   # The following line ensures that the Material Icons font is

@@ -127,6 +127,8 @@ class _ProductsListState extends State<ProductsList> {
           )
         ),
         actions: [
+          Padding(padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child:
           ElevatedButton.icon(
             onPressed: () async {
               final result = await Navigator.push(
@@ -139,8 +141,8 @@ class _ProductsListState extends State<ProductsList> {
                 _addProductFromMap(result);
               }
             },
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text('เพิ่มสินค้า', style: TextStyle(color: Colors.white)),
+            icon: Icon(Icons.add, color: Colors.white),
+            label: Text('เพิ่มสินค้า', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8D6E63), 
               elevation: 6, 
@@ -150,7 +152,7 @@ class _ProductsListState extends State<ProductsList> {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-          )
+          ))
         ],
       ),
       body: _products.isEmpty
