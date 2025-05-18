@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 // import 'package:sandy_roots/services/CategoryListPage.dart';
 import 'package:sandy_roots/services/category_provider.dart';
@@ -141,30 +142,69 @@ class _AddProductPageState extends State<AddProductPage> {
   }
 
   void _saveProduct() {
-    String name = _nameCtrl.text.trim();
-    String price = _priceCtrl.text.trim();
-    String category = selectedCategory ?? '';
-    String description = _descCtrl.text.trim();
+  String name = _nameCtrl.text.trim();
+  String price = _priceCtrl.text.trim();
+  String category = selectedCategory ?? '';
+  String description = _descCtrl.text.trim();
 
-    if (name.isEmpty || price.isEmpty || category.isEmpty || description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบทุกช่อง')),
-      );
-      return;
-    }
-
+  if (name.isEmpty || price.isEmpty || category.isEmpty || description.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('บันทึกสินค้าเรียบร้อย')),
-    );
-
-    Navigator.pop(context, {
-      'name': name,
-      'price': price,
-      'category': category,
-      'description': description,
-      'image': _imageFile?.path ?? 'assets/images/default_sandyroot.png',
-    });
+      SnackBar(
+        content: Text("กรุณากรอกข้อมูลให้ครบทุกช่อง"),
+        backgroundColor: Color(0xFFE97451).withOpacity(0.8),
+        behavior: SnackBarBehavior.floating,
+         shape: RoundedRectangleBorder(
+         borderRadius: BorderRadius.circular(12),
+        ),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        duration: Duration(seconds: 3),
+      ),
+     );
+    return;
   }
+
+  // ตรวจสอบว่า price เป็นตัวเลขหรือไม่
+  final parsedPrice = double.tryParse(price);
+  if (parsedPrice == null) {
+  
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("กรุณากรอกราคาที่เป็นตัวเลขเท่านั้น"),
+        backgroundColor: Color(0xFFE97451).withOpacity(0.8),
+        behavior: SnackBarBehavior.floating,
+         shape: RoundedRectangleBorder(
+         borderRadius: BorderRadius.circular(12),
+        ),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        duration: Duration(seconds: 3),
+      ),
+     );
+    return;
+  }
+
+  
+  ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text("บันทึกสินค้าเรียบร้อย"),
+          backgroundColor: Color(0xFF708238).withOpacity(0.7),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          duration: Duration(seconds: 2),
+          ),
+        );
+
+  Navigator.pop(context, {
+    'name': name,
+    'price': price,
+    'category': category,
+    'description': description,
+    'image': _imageFile?.path ?? 'assets/images/default_sandyroot.png',
+  });
+}
+
 
   Future<void> addNewCategory() async {
     final newCat = searchCategoryCtrl.text.trim();
@@ -182,6 +222,9 @@ class _AddProductPageState extends State<AddProductPage> {
       Navigator.pop(context);
     }
   }
+
+
+
 
 
 
@@ -221,11 +264,21 @@ class _AddProductPageState extends State<AddProductPage> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+      body: Stack(
+        children: [
+          Align(
+          alignment: Alignment.bottomCenter,
+            child: Image.asset(
+              'assets/images/24.png',
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+            ),
+        ),
+        SingleChildScrollView(
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
             Stack(
               alignment: Alignment.bottomRight,
               children: [
@@ -311,6 +364,9 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               child: TextField(
                 controller: _priceCtrl,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: 'ราคา (฿)',
@@ -386,8 +442,8 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
             ),
           ],
-        ),
-      ),
+            )))])
+      
     );
   }
 }

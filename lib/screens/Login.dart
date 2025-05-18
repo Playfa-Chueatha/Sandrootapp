@@ -3,6 +3,7 @@ import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/screens/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBar_admin.dart';
+import 'package:sandy_roots/services/animasion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:sandy_roots/services/ShowUserJsonScreen%20.dart';
 
@@ -48,7 +49,7 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF9F7F3),
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
             Align(
@@ -71,27 +72,51 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFA8D5BA).withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    height: screenHeight * _containerHeightFactor,
-                    width: screenWidth * 0.9,
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        TabBar(
+                          duration: Duration(milliseconds: 600),
+                          curve: Curves.easeInOutBack,  
+                          decoration: BoxDecoration(
+                            color: Color(0xFFFAF0E6).withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              //บนซ้าย
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.2),
+                                offset: Offset(-4, -4),
+                                blurRadius: 2,
+                                spreadRadius: 1,
+                              ),
+                              //ล่างขวา
+                              BoxShadow(
+                                color: Colors.brown.withOpacity(0.2),
+                                offset: Offset(4, 4),
+                                blurRadius: 2,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          height: screenHeight * _containerHeightFactor,
+                          width: screenWidth * 0.9,
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              TabBar(
                           controller: _tabController,
-                          indicatorColor: Colors.green,
-                          labelColor: Colors.black,
-                          unselectedLabelColor: Colors.black54,
-                          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                          tabs: const [
-                            Tab(text: 'Login'),
-                            Tab(text: 'Register'),
+                          indicatorColor: Color(0xFF4B3621),
+                          tabs: [
+                            AnimatedCircleTab(
+                              text: 'Login',
+                              isSelected: _tabController.index == 0,
+                            ),
+                            AnimatedCircleTab(
+                              text: 'Register',
+                              isSelected: _tabController.index == 1,
+                            ),
                           ],
+                          onTap: (index) {
+                            setState(() {
+                              _tabController.index = index; 
+                            });
+                          },
                         ),
                         Expanded(
                           child: TabBarView(
@@ -104,7 +129,7 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
                         ),
                       ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -141,41 +166,9 @@ class __LoginState extends State<_Login> {
     usernameOrEmailController.dispose();
     passwordController.dispose();
     super.dispose();
-    dataUser.loadUsers(); 
+    
   }
 
-  
-
-  Future<void> loginUser() async {
-    String email = usernameOrEmailController.text.trim();
-    String password = passwordController.text;
-
-    await widget.userManager.loadUsers();
-
-    if (widget.userManager.login(email, password)) {
-      await saveLoginStatus(); 
-      UserProfile userProfile = widget.userManager.getUserProfile(email, password)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("เข้าสู่ระบบสำเร็จ"),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => AppbarBuyer(userDetails: userProfile)),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("อีเมลหรือรหัสผ่านไม่ถูกต้อง"),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
 
 
   Future<void> saveLoginStatus() async {
@@ -203,53 +196,104 @@ class __LoginState extends State<_Login> {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(height: screenHeight * 0.03),
-              SizedBox(
+              Container(
                 width: MediaQuery.of(context).size.width * 0.75,
                 height: 60,
+                decoration: BoxDecoration(
+                  color: Color(0xFFCDE3C0).withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFFDF9F4).withOpacity(0.6),
+                      offset: Offset(-4, -4),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                    BoxShadow(
+                      color: Colors.brown.withOpacity(0.25),
+                      offset: Offset(4, 4),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
                 child: TextFormField(
                   controller: usernameOrEmailController,
                   decoration: InputDecoration(
                     hintText: 'Username or Email',
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.person, color: Color(0xFF8B5E3C)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.transparent,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintStyle: TextStyle(color: Color(0xFF8B5E3C).withOpacity(0.7)),
+                    contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16), // ปรับความสูงของ TextField
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณากรอกชื่อผู้ใช้หรืออีเมล';
-                    }
-                    return null;
-                  },
-                )
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                ),
               ),
               SizedBox(height: screenHeight * 0.02),
-              SizedBox(
+              Container(
                 width: MediaQuery.of(context).size.width * 0.75,
                 height: 60,
-                child:TextFormField(
+                decoration: BoxDecoration(
+                  color: Color(0xFFCDE3C0).withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFFDF9F4).withOpacity(0.6),
+                      offset: Offset(-4, -4),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                    BoxShadow(
+                      color: Colors.brown.withOpacity(0.25),
+                      offset: Offset(4, 4),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: TextFormField(
                   controller: passwordController,
                   obscureText: _isObscurd,
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
+                    prefixIcon: Icon(Icons.lock, color: Color(0xFF8B5E3C)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.transparent, 
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
                     suffixIcon: IconButton(
-                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
+                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility), color: Color(0xFF8B5E3C),
                       onPressed: () {
                         setState(() {
                           _isObscurd = !_isObscurd;
                         });
                       },
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16), 
+                    hintStyle: TextStyle(color: Color(0xFF8B5E3C).withOpacity(0.7)),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -257,68 +301,112 @@ class __LoginState extends State<_Login> {
                     }
                     return null;
                   },
-                )
+                ),
               ),
               SizedBox(height: screenHeight * 0.04),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF8B5E3C),
+
+              //login button
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFF9C7B56).withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.brown.shade300.withOpacity(0.4), 
+                      offset: Offset(-4, -4),
+                      blurRadius: 6,
+                    ),
+                    BoxShadow(
+                      color: Colors.brown.shade700.withOpacity(0.6), 
+                      offset: Offset(4, 4),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    String useroremail = usernameOrEmailController.text.trim();
-                    String password = passwordController.text.trim();
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      String useroremail = usernameOrEmailController.text.trim();
+                      String password = passwordController.text.trim();
 
-                    if (useroremail == 'admin' && password == '1234') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Login successful"),
-                          backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProductsScreen()),
-                      );
-                    } else {
-                      await widget.userManager.loadUsers(); 
-                      bool success = widget.userManager.login(useroremail, password);
+                      if (useroremail == 'admin' && password == '1234') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("เริ่มการขายใน SandRoots store"),
+                            backgroundColor: Color(0xFF708238).withOpacity(0.7),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => ProductsScreen()),
+                        );
+                      } else {
+                        await widget.userManager.loadUsers(); 
+                        bool success = widget.userManager.login(useroremail, password);
 
-                      if (success) {
-                        UserProfile? user = widget.userManager.getUserProfile(useroremail, password);
-                        if (user != null) {
+                        if (success) {
+                          UserProfile? user = widget.userManager.getUserProfile(useroremail, password);
+                          if (user != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("ยินดีต้อนรับสู่ SandRoots store"),
+                                backgroundColor: Color(0xFF708238).withOpacity(0.7),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AppbarBuyer(userDetails: user),
+                              ),
+                            );
+                          }
+                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("Welcome to SandRoots store"),
-                              backgroundColor: Colors.green,
+                              content: Text("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"),
+                              backgroundColor: Color(0xFFE97451).withOpacity(0.8),
                               behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AppbarBuyer(userDetails: user),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              duration: Duration(seconds: 3),
                             ),
                           );
                         }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"),
-                            backgroundColor: Colors.red,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
                       }
                     }
-                  }
-                },
-                child: Text('Login', style: TextStyle(color: Colors.white)),
+                  },
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                      color: Color(0xFFFAF0E6), 
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
               Spacer(),
               TextButton(
@@ -329,7 +417,13 @@ class __LoginState extends State<_Login> {
                   );
 
                 },
-                child: Text("ลืมรหัสผ่าน", style: TextStyle(color: Colors.redAccent)),
+                child: Text(
+                  "ลืมรหัสผ่าน", 
+                  style: TextStyle(
+                    color: Color(0xFFB7410E),
+                    fontSize: 16,
+                  )
+                ),
               ),
               // TextButton(
               //   onPressed: () {
@@ -439,12 +533,17 @@ bool isValidUsername(String username) {
   if (formkey.currentState?.validate() ?? false) {
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("รหัสผ่านไม่ตรงกัน"),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+          SnackBar(
+            content: Text("รหัสผ่านไม่ตรงกัน"),
+            backgroundColor: Color(0xFFE97451).withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            duration: Duration(seconds: 3),
+          ),
+        );
       return;
     }
 
@@ -455,12 +554,16 @@ bool isValidUsername(String username) {
         await dataUser.saveUsers();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("สมัครสมาชิกสำเร็จ"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
+              content: Text("สมัครสมาชิกสำเร็จ"),
+              backgroundColor: Color(0xFF708238).withOpacity(0.7),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              duration: Duration(seconds: 2),
           ),
         );
-
         emailController.clear();
         usernameController.clear();
         passwordController.clear();
@@ -476,8 +579,13 @@ bool isValidUsername(String username) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("อีเมลนี้ถูกใช้งานแล้ว"),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFFE97451).withOpacity(0.8),
             behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            duration: Duration(seconds: 3),
           ),
         );
         break;
@@ -486,8 +594,13 @@ bool isValidUsername(String username) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("ชื่อผู้ใช้นี้ถูกใช้งานแล้ว"),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFFE97451).withOpacity(0.8),
             behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            duration: Duration(seconds: 3),
           ),
         );
         break;
@@ -509,23 +622,49 @@ bool isValidUsername(String username) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-
-
                 // Email
-                SizedBox(
+                Container(
                   width: MediaQuery.of(context).size.width * 0.75,
                   height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFCDE3C0).withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFFDF9F4).withOpacity(0.6),
+                        offset: Offset(-4, -4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.brown.withOpacity(0.25),
+                        offset: Offset(4, 4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
                   child: TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: Icon(Icons.email, color: Color(0xFF8B5E3C)),
                       hintText: 'Email',
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.transparent,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                      hintStyle: TextStyle(color: Color(0xFF8B5E3C).withOpacity(0.7)),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -535,25 +674,53 @@ bool isValidUsername(String username) {
                       }
                       return null;
                     },
-                  )
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
 
                 // Username
-                SizedBox(
+                Container(
                   width: MediaQuery.of(context).size.width * 0.75,
                   height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFCDE3C0).withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFFDF9F4).withOpacity(0.6),
+                        offset: Offset(-4, -4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.brown.withOpacity(0.25),
+                        offset: Offset(4, 4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
                   child: TextFormField(
                     controller: usernameController,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person),
+                      prefixIcon: Icon(Icons.person, color: Color(0xFF8B5E3C)),
                       hintText: 'Username',
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.transparent,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                      hintStyle: TextStyle(color: Color(0xFF8B5E3C).withOpacity(0.7)),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -562,22 +729,18 @@ bool isValidUsername(String username) {
 
                       final trimmed = value.trim();
 
-                      
                       if (RegExp(r'[\u0E00-\u0E7F]').hasMatch(trimmed)) {
                         return 'ไม่อนุญาตให้กรอกภาษาไทย';
                       }
 
-                      
                       if (!RegExp(r'^[a-zA-Z0-9\-_.@]+$').hasMatch(trimmed)) {
                         return 'ชื่อผู้ใช้สามารถประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวเลข และ . - _ @ เท่านั้น';
                       }
 
-                      
                       if (trimmed.length < 4) {
                         return 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 4 ตัวอักษร';
                       }
 
-                      
                       return null;
                     },
                   ),
@@ -585,19 +748,38 @@ bool isValidUsername(String username) {
                 SizedBox(height: screenHeight * 0.02),
 
                 // Password
-                SizedBox(
+                Container(
                   width: MediaQuery.of(context).size.width * 0.75,
                   height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFCDE3C0).withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFFDF9F4).withOpacity(0.6),
+                        offset: Offset(-4, -4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.brown.withOpacity(0.25),
+                        offset: Offset(4, 4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
                   child: TextFormField(
                     controller: passwordController,
                     obscureText: _isObscurd,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon: Icon(Icons.lock, color: Color(0xFF8B5E3C)),
                       hintText: 'Password',
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.transparent,
                       suffixIcon: IconButton(
                         icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
+                        color: Color(0xFF8B5E3C),
                         onPressed: () {
                           setState(() {
                             _isObscurd = !_isObscurd;
@@ -608,6 +790,16 @@ bool isValidUsername(String username) {
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                      hintStyle: TextStyle(color: Color(0xFF8B5E3C).withOpacity(0.7)),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -622,19 +814,38 @@ bool isValidUsername(String username) {
                 SizedBox(height: screenHeight * 0.02),
 
                 // Confirm Password
-                SizedBox(
+                Container(
                   width: MediaQuery.of(context).size.width * 0.75,
                   height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFCDE3C0).withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFFDF9F4).withOpacity(0.6),
+                        offset: Offset(-4, -4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.brown.withOpacity(0.25),
+                        offset: Offset(4, 4),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
                   child: TextFormField(
                     controller: confirmPasswordController,
                     obscureText: _isObscurd2,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon: Icon(Icons.lock, color: Color(0xFF8B5E3C)),
                       hintText: 'Confirm Password',
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.transparent,
                       suffixIcon: IconButton(
                         icon: Icon(_isObscurd2 ? Icons.visibility_off : Icons.visibility),
+                        color: Color(0xFF8B5E3C),
                         onPressed: () {
                           setState(() {
                             _isObscurd2 = !_isObscurd2;
@@ -645,6 +856,16 @@ bool isValidUsername(String username) {
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                      hintStyle: TextStyle(color: Color(0xFF8B5E3C).withOpacity(0.7)),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -655,21 +876,48 @@ bool isValidUsername(String username) {
                       return null;
                     },
                   ),
-                ),
+                ),              
                 SizedBox(height: screenHeight * 0.06),
 
                 // Register Button
-                ElevatedButton(
+                Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFF9C7B56).withOpacity(0.6), 
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.brown.shade700.withOpacity(0.6), 
+                      offset: Offset(4, 4),
+                      blurRadius: 6,
+                    ),
+                    BoxShadow(
+                      color: Colors.brown.shade300.withOpacity(0.4), 
+                      offset: Offset(-4, -4),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
                   onPressed: registerUser,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF8B5E3C),
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   ),
-                  child: Text('Register', style: TextStyle(color: Colors.white)),
+                  child: Text(
+                    'Register',
+                    style: TextStyle(
+                      color: Color(0xFFFAF0E6), 
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
+              ),
               ],
             ),
           ),

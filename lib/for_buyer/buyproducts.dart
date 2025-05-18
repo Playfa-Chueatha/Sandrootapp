@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sandy_roots/Data/data_shoppingCart.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 
@@ -326,13 +327,39 @@ class _buyproductsState extends State<buyproducts> {
                   elevation: 8,  
                   shadowColor: Colors.brown.withOpacity(0.5), 
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (addressController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('กรุณากรอกที่อยู่จัดส่ง')),
+                      SnackBar(
+                        content: Text("กรุณากรอกที่อยู่จัดส่ง"),
+                        backgroundColor: Color(0xFFE97451).withOpacity(0.8),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        duration: Duration(seconds: 3),
+                      ),
                     );
                     return;
                   }
+                  await Cart.clear(widget.userDetails.email);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("สั่งซื้อสำเร็จแล้ว!"),
+                      backgroundColor: Color(0xFF708238).withOpacity(0.8),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top + 16,
+                        left: 16,
+                        right: 16,
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

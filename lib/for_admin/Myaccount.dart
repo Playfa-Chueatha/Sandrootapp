@@ -19,46 +19,84 @@ class Myaccount extends StatelessWidget {
             ),
           ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            
-            // CircleAvatar(
-            //     radius: 60,
-            //     backgroundImage: const AssetImage('assets/images/default_sandyroot.png') as ImageProvider,
-            // ),
-                          
-            const SizedBox(height: 20),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text('ชื่อผู้ใช้'),
-              subtitle: Text('admin'),
+      body: Stack(
+        children: [
+          Align(
+          alignment: Alignment.bottomCenter,
+            child: Image.asset(
+              'assets/images/backgroundSandyRoots.png',
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
             ),
-            const SizedBox(height: 20),
-            
-            ElevatedButton.icon(
-              onPressed: () {
-                
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Mainlogin()),
-                );
-              },
-              icon: const Icon(Icons.logout),
-              label: const Text('ออกจากระบบ'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[300],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              
+              // CircleAvatar(
+              //     radius: 60,
+              //     backgroundImage: const AssetImage('assets/images/default_sandyroot.png') as ImageProvider,
+              // ),
+                            
+              const SizedBox(height: 20),
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text('ชื่อผู้ใช้'),
+                subtitle: Text('admin'),
               ),
-            ),
+              const SizedBox(height: 20),
+              
+              ElevatedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.white,
+                        title: Text('ยืนยันการออกจากระบบ'),
+                        content: Text('คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?'),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text('ยกเลิก',style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red[300],
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop(); 
 
-          
+                              
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => const Mainlogin()),
+                                (Route<dynamic> route) => false,
+                              );
+                            },
+                            child: Text('ออกจากระบบ',style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text('ออกจากระบบ'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[300],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),     
           ],
         ),
-      ),
+      )])
     );
   }
 }

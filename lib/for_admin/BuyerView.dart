@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
@@ -261,16 +262,29 @@ class _BuyerViewState extends State<BuyerView> {
                                               );
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xFFf0ede4),
+                                              backgroundColor: Color(0xFFC3B091),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: Text('ดูรายละเอียด', 
-                                            style: GoogleFonts.notoSansThai(
-                                              fontSize: 12, 
-                                              color: Colors.black,
-                                            ))
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons.eye,
+                                                  size: 18,
+                                                  color: Color(0xFF654321),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  'ดูรายละเอียด',
+                                                  style: GoogleFonts.notoSansThai(
+                                                    fontSize: 14,
+                                                    color: Color(0xFF654321),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         )),
                                       ],

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/for_buyer/Home.dart';
@@ -119,11 +120,11 @@ Widget build(BuildContext context) {
         });
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก',backgroundColor: Color(0xFFf6f3ec)),
-        BottomNavigationBarItem(icon: Icon(Icons.category), label: 'หมวดหมู่',backgroundColor: Color(0xFFf6f3ec)),
-        BottomNavigationBarItem(icon: Icon(Icons.list), label: 'รายการสั่งซื้อ',backgroundColor: Color(0xFFf6f3ec)),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'ตระกร้า',backgroundColor: Color(0xFFf6f3ec)),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'บัญชีผู้ใช้',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.home), label: 'หน้าหลัก',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.list), label: 'หมวดหมู่',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.clipboardList), label: 'รายการสั่งซื้อ',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.shoppingCart), label: 'ตระกร้า',backgroundColor: Color(0xFFf6f3ec)),
+        BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.user), label: 'บัญชีผู้ใช้',backgroundColor: Color(0xFFf6f3ec)),
       ],
     ),
   );

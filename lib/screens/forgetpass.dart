@@ -77,7 +77,16 @@ class _ForgetpassState extends State<Forgetpass> {
 
       if (newPassword != confirmPassword) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("❗ รหัสผ่านไม่ตรงกัน")),
+          SnackBar(
+            content: Text("รหัสผ่านไม่ตรงกัน"),
+            backgroundColor: Color(0xFFE97451).withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            duration: Duration(seconds: 3),
+          ),
         );
         return;
       }
@@ -85,8 +94,18 @@ class _ForgetpassState extends State<Forgetpass> {
       bool success = await updateUserPassword(email, username, newPassword);
 
       if (success) {
+      
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("✅ เปลี่ยนรหัสผ่านสำเร็จ")),
+          SnackBar(
+              content: Text("เปลี่ยนรหัสผ่านสำเร็จ"),
+              backgroundColor: Color(0xFF708238).withOpacity(0.7),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              duration: Duration(seconds: 2),
+          ),
         );
         Navigator.pushReplacement(
           context,
@@ -94,28 +113,83 @@ class _ForgetpassState extends State<Forgetpass> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("❌ ไม่พบผู้ใช้หรือข้อมูลไม่ตรงกัน")),
+          SnackBar(
+            content: Text("ไม่พบผู้ใช้หรือข้อมูลไม่ตรงกัน"),
+            backgroundColor: Color(0xFFE97451).withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            duration: Duration(seconds: 3),
+          ),
         );
       }
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('ลืมรหัสผ่าน')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
+Widget build(BuildContext context) {
+  double screenWidth = MediaQuery.of(context).size.width;
+
+  return Scaffold(
+    backgroundColor: Color(0xFFf6f3ec),
+    appBar: AppBar(
+      backgroundColor: Color(0xFFf6f3ec),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.black),
+        onPressed: () => Navigator.pop(context),
+      ),
+    ),
+    body: Stack(
+      children: [
+
+      Align(
+        alignment: Alignment.bottomCenter,
+          child: Image.asset(
+            'assets/images/22.png',
+            width: double.infinity,
+            fit: BoxFit.fitWidth,
+          ),
+      ),
+ 
+      SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              
+
+              Center(
+                child: Text(
+                  'Reset Password',
+                  style: TextStyle(fontSize: 30),
+                )
+              ),
+              SizedBox(height: 30),
+
+              // อีเมล
+              Container(
+                width: screenWidth * 0.9,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF0E3C6).withOpacity(0.5), 
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(2, 2),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: TextFormField(
                   controller: emailController,
                   decoration: InputDecoration(
+                    border: InputBorder.none,
                     labelText: 'อีเมล',
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Color(0xFF3E2C1C)),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -127,25 +201,64 @@ class _ForgetpassState extends State<Forgetpass> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
-                TextFormField(
+              ),
+              SizedBox(height: 16),
+
+              // ชื่อผู้ใช้
+              Container(
+                width: screenWidth * 0.9,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF0E3C6).withOpacity(0.5), 
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(2, 2),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: TextFormField(
                   controller: usernameController,
                   decoration: InputDecoration(
+                    border: InputBorder.none,
                     labelText: 'ชื่อผู้ใช้',
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Color(0xFF3E2C1C)),
+                    hintStyle: TextStyle(fontSize: 16),
                   ),
                   validator: (value) =>
                       value == null || value.isEmpty ? 'กรุณากรอกชื่อผู้ใช้' : null,
                 ),
-                SizedBox(height: 16),
-                TextFormField(
+              ),
+              SizedBox(height: 16),
+
+              // รหัสผ่านใหม่
+              Container(
+                width: screenWidth * 0.9,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF0E3C6).withOpacity(0.5), 
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(2, 2),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: TextFormField(
                   controller: newPasswordController,
                   obscureText: _isObscurd,
                   decoration: InputDecoration(
+                    border: InputBorder.none,
                     labelText: 'รหัสผ่านใหม่',
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Color(0xFF3E2C1C)),
                     suffixIcon: IconButton(
-                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),
+                      icon: Icon(_isObscurd ? Icons.visibility_off : Icons.visibility),color: Color(0xFF3E2C1C),
                       onPressed: () {
                         setState(() {
                           _isObscurd = !_isObscurd;
@@ -153,7 +266,6 @@ class _ForgetpassState extends State<Forgetpass> {
                       },
                     ),
                   ),
-                  
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'กรุณากรอกรหัสผ่านใหม่';
@@ -164,15 +276,34 @@ class _ForgetpassState extends State<Forgetpass> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
-                TextFormField(
+              ),
+              SizedBox(height: 16),
+
+              // ยืนยันรหัสผ่านใหม่
+              Container(
+                width: screenWidth * 0.9,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF0E3C6).withOpacity(0.5),               
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(2, 2),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: TextFormField(
                   controller: confirmPasswordController,
                   obscureText: _isObscurd2,
                   decoration: InputDecoration(
+                    border: InputBorder.none,
                     labelText: 'ยืนยันรหัสผ่านใหม่',
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Color(0xFF3E2C1C)),
                     suffixIcon: IconButton(
-                      icon: Icon(_isObscurd2 ? Icons.visibility_off : Icons.visibility),
+                      icon: Icon(_isObscurd2 ? Icons.visibility_off : Icons.visibility),color: Color(0xFF3E2C1C),
                       onPressed: () {
                         setState(() {
                           _isObscurd2 = !_isObscurd2;
@@ -187,16 +318,32 @@ class _ForgetpassState extends State<Forgetpass> {
                     return null;
                   },
                 ),
-                SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: onSubmit,
-                  child: Text('เปลี่ยนรหัสผ่าน'),
+              ),
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: onSubmit,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white, 
+                  backgroundColor: Color(0xFF7A8A3A).withOpacity(0.6), 
+                  elevation: 10,
+                  shadowColor: Colors.black45, 
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16), 
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  textStyle: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
-              ],
-            ),
+                child: Text('เปลี่ยนรหัสผ่าน'),
+              ),
+              
+              
+
+            ],
           ),
         ),
-      ),
+      )])
     );
   }
 }

@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
 import 'package:sandy_roots/for_admin/add_product.dart';
-import 'package:sandy_roots/for_admin/dialog_order.dart';
+import 'package:sandy_roots/for_admin/EditProducts.dart';
 
 class ProductsList extends StatefulWidget {
   const ProductsList({super.key});
@@ -96,10 +96,13 @@ class _ProductsListState extends State<ProductsList> {
 
   void _updateProduct(int index, Product updatedProduct) {
     setState(() {
-      _products[index] = updatedProduct;
+      _products[index] = updatedProduct; 
     });
     _saveProducts();
   }
+
+
+
 
   void _deleteProduct(int index) {
     setState(() {
@@ -192,25 +195,26 @@ class _ProductsListState extends State<ProductsList> {
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (c) => dialog_order(
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        description: product.description,
-                        imageUrl: product.imageUrl,
-                        category: product.category,
-                        onSave: (updatedProduct) {
-                          _updateProduct(index, updatedProduct);
-                        },
-                        onDelete: (id) {
-                          _deleteProduct(index);
-                        },
-                      ),
-                    );
-                  },
-                ),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Editproducts(
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          description: product.description,
+                          imageUrl: product.imageUrl,
+                          category: product.category,
+                          onSave: (updatedProduct) {
+                            _updateProduct(index, updatedProduct);
+                          },
+                          onDelete: (id) {
+                            _deleteProduct(index);
+                          },
+                        )
+                      )
+                    );}        
+                )
               ],
             ),
           );

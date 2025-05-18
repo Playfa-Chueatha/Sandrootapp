@@ -97,8 +97,32 @@ class _DetailproductState extends State<Detailproduct_admin> {
                       onPressed: () {
                       
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${widget.name} คุณกำลังอยู่ในมุมมองผู้ซื้อ')),
-                        );
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.info_outline, color: Colors.white),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'คุณกำลังอยู่ในมุมมองผู้ซื้อ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: Color(0xFF7B5E57).withOpacity(0.5), 
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+
                       },
                       icon: Icon(Icons.add),style: ButtonStyle(
                         iconColor: MaterialStateProperty.all<Color>(Colors.black),
@@ -111,8 +135,31 @@ class _DetailproductState extends State<Detailproduct_admin> {
                       onPressed: () {
                 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${widget.name} คุณกำลังอยู่ในมุมมองผู้ซื้อ')),
-                        );
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.info_outline, color: Colors.white),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'คุณกำลังอยู่ในมุมมองผู้ซื้อ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: Color(0xFF7B5E57).withOpacity(0.5), 
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
                       },
                       icon: Icon(Icons.shopping_bag),style: ButtonStyle(
                         iconColor: MaterialStateProperty.all<Color>(Colors.black),

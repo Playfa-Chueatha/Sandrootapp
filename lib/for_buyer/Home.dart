@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
 import 'package:sandy_roots/Data/data_user.dart';
 import 'package:sandy_roots/for_buyer/detailproduct.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserProfile userDetails;
@@ -304,16 +305,31 @@ class _HomeScreenState extends State<HomeScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFf0ede4),
+                              backgroundColor: Color(0xFFC3B091),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              elevation: 2,
                             ),
-                            child: Text('ดูรายละเอียด', 
-                            style: GoogleFonts.notoSansThai(
-                              fontSize: 12, 
-                              color: Colors.black,
-                            ))
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.eye,
+                                  size: 18,
+                                  color: Color(0xFF654321),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'ดูรายละเอียด',
+                                  style: GoogleFonts.notoSansThai(
+                                    fontSize: 14,
+                                    color: Color(0xFF654321),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         )),
                       ],

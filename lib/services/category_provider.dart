@@ -8,9 +8,25 @@ class CategoryManager {
 
   static const _key = 'categories_key';
 
+  
+  final List<String> _defaultCategories = [
+    'ไม้ประดับ',
+    'สายขน',
+    'ไม้เลื้อย/หางยาว',
+    'ไม้จิ๋ว/ไม้ถาด',
+  ];
+
   Future<void> loadCategories() async {
     final prefs = await SharedPreferences.getInstance();
-    categories = prefs.getStringList(_key) ?? [];
+    final savedCategories = prefs.getStringList(_key);
+
+    
+    if (savedCategories == null || savedCategories.isEmpty) {
+      categories = List.from(_defaultCategories);
+      await _saveCategories(); 
+    } else {
+      categories = savedCategories;
+    }
   }
 
   Future<void> addCategory(String category) async {
@@ -21,5 +37,11 @@ class CategoryManager {
   Future<void> _saveCategories() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_key, categories);
+  }
+
+  
+  Future<void> resetToDefault() async {
+    categories = List.from(_defaultCategories);
+    await _saveCategories();
   }
 }

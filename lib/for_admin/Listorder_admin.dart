@@ -163,7 +163,7 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
                   onStatusUpdated();
                   Navigator.pop(context);
                 },
-                child: const Text('ได้รับสินค้าแล้ว'),
+                child: const Text('จัดส่งสินค้าแล้ว'),
               ),
           TextButton(
             onPressed: () => Navigator.pop(context),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
 import 'package:sandy_roots/for_admin/BuyerView.dart';
 import 'package:sandy_roots/for_admin/Listorder_admin.dart';
@@ -68,19 +69,19 @@ class _OrderScreenState extends State<ProductsScreen> {
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.storefront),
+            icon: Icon(FontAwesomeIcons.store),
             label: 'จัดการสินค้า',backgroundColor: Color(0xFFf6f3ec)
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: Icon(FontAwesomeIcons.clipboardList),
             label: 'รายการสั่งซื้อ',backgroundColor: Color(0xFFf6f3ec)
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.visibility),
+            icon: Icon(FontAwesomeIcons.eye),
             label: 'มุมมองผู้ซื้อ',backgroundColor: Color(0xFFf6f3ec)
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(FontAwesomeIcons.user),
             label: 'บัญชีผู้ใช้',backgroundColor: Color(0xFFf6f3ec)
           ),
         ],

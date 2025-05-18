@@ -126,8 +126,18 @@ class _DetailproductState extends State<Detailproduct> {
                         );
 
 
+                        
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${widget.name} ถูกเพิ่มลงในตะกร้าแล้ว')),
+                          SnackBar(
+                              content: Text("สินค้าถูกเพิ่มลงในตะกร้าแล้ว",style: TextStyle(fontSize: 14),),
+                              backgroundColor: Color(0xFF708238).withOpacity(0.8),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              duration: Duration(seconds: 1),
+                          ),
                         );
                       },
                       icon: Icon(Icons.add),style: ButtonStyle(
