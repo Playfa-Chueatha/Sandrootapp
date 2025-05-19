@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-
+    final crossAxisCount = 2;
     return Scaffold(
       backgroundColor: Color(0xFFf6f3ec),
       body: SafeArea(
@@ -216,15 +216,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       .toList(),
                 ),
               ),
+              
 
             // ---------------- Product List --------------------
-            Padding(padding: EdgeInsets.all(10),
-            child: GridView.builder(
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: GridView.builder(
                 itemCount: _filteredProducts.length,
-                shrinkWrap: true, 
-                physics: const NeverScrollableScrollPhysics(), 
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   childAspectRatio: 0.7,
@@ -232,7 +234,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   final product = _filteredProducts[index];
                   return Container(
-                    
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -240,105 +241,108 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                            borderRadius: BorderRadius.only(
+                        Expanded( 
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20)
-                              ),
+                              topRight: Radius.circular(20),
+                            ),
                             child: product.imageUrl.startsWith('assets/')
                                 ? Image.asset(
                                     product.imageUrl,
-                                    height: screenHeight * 0.15,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   )
                                 : Image.file(
                                     File(product.imageUrl),
-                                    height: screenHeight * 0.15,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   ),
                           ),
-                        
+                        ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(5, 5, 5, 1),
+                          padding: const EdgeInsets.fromLTRB(5, 5, 5, 1),
                           child: Text(
-                            product.name, 
-                            style: GoogleFonts.notoSansThai(fontSize: 16,color: Colors.black),
+                            product.name,
+                            style: GoogleFonts.notoSansThai(fontSize: 16, color: Colors.black),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 1, 5, 2),
+                          child: Text(
+                            product.description,
+                            style: GoogleFonts.notoSansThai(fontSize: 12, color: Colors.grey),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            )
-                        ),
-                        Padding(padding: EdgeInsets.fromLTRB(5, 1, 5, 2),
-                          child: Text(
-                              product.description,
-                              style: GoogleFonts.notoSansThai(fontSize: 12, color: Colors.grey),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          ),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(5, 2, 5, 5),
-                          child: Text('${product.price} ฿', 
+                          padding: const EdgeInsets.fromLTRB(5, 2, 5, 5),
+                          child: Text(
+                            '${product.price} ฿',
                             style: GoogleFonts.notoSansThai(
-                              color: Color.fromARGB(255, 123, 131, 102), 
-                              fontSize: 14
-                            ))),
-                        Spacer(),
-                        Padding(padding: EdgeInsets.all(5),
-                        child: Center(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Detailproduct(
-                                    id: product.id,
-                                    name: product.name,
-                                    price: product.price,
-                                    description: product.description,
-                                    imageUrl: product.imageUrl,
-                                    category: product.category,
-                                    userDetails: widget.userDetails,
-                                  ),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFC3B091),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              elevation: 2,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  FontAwesomeIcons.eye,
-                                  size: 18,
-                                  color: Color(0xFF654321),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'ดูรายละเอียด',
-                                  style: GoogleFonts.notoSansThai(
-                                    fontSize: 14,
-                                    color: Color(0xFF654321),
-                                  ),
-                                ),
-                              ],
+                              color: Color.fromARGB(255, 123, 131, 102),
+                              fontSize: 14,
                             ),
                           ),
-                        )),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Detailproduct(
+                                      id: product.id,
+                                      name: product.name,
+                                      price: product.price,
+                                      description: product.description,
+                                      imageUrl: product.imageUrl,
+                                      category: product.category,
+                                      userDetails: widget.userDetails,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFC3B091),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                elevation: 2,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    FontAwesomeIcons.eye,
+                                    size: 18,
+                                    color: Color(0xFF654321),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'ดูรายละเอียด',
+                                    style: GoogleFonts.notoSansThai(
+                                      fontSize: 14,
+                                      color: Color(0xFF654321),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   );
                 },
               ),
             ),
-
             SizedBox(height: screenHeight * 0.01) 
           ],
         ),
