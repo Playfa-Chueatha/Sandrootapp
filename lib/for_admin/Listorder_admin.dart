@@ -73,20 +73,27 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
     context: context,
     builder: (_) => StatefulBuilder(
       builder: (context, setState) => AlertDialog(
-        backgroundColor: const Color(0xFFF9F9F9),
+        backgroundColor:  Color(0xFFF9F9F9),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
                   style: const TextStyle(fontSize: 12, color: Color.fromARGB(255, 107, 107, 107))),
+              const SizedBox(height: 6),
               Text('อีเมลผู้สั่งซื้อ: ${order['email']}'),
-              Padding(
-                padding: const EdgeInsets.all(5),
-                child: Text('ที่อยู่จัดส่ง: ${order['address']}',
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.notoSansThai(fontSize: 15))),
+              Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Color(0xFFCD853F).withOpacity(0.4)
+                    ),
+                    child: Text(
+                      'ที่อยู่จัดส่ง: ${order['address']}', 
+                      maxLines: 4, 
+                      overflow: TextOverflow.ellipsis, 
+                      style: GoogleFonts.notoSansThai(fontSize: 15)
+                  )),
               const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
               ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
@@ -108,8 +115,22 @@ class _ListorderState extends State<Listorder> with TickerProviderStateMixin {
                               fit: BoxFit.cover,
                             ),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('${item['name']} (x${item['quantity']})')),
-                      Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
+                     Expanded(
+                      child: Text(
+                        '${item['name']} (x${item['quantity']})',
+                        style: GoogleFonts.notoSansThai(),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 70,
+                      child: Text(
+                        '${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿',
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.notoSansThai(),
+                      ),
+                    ),
                     ],
                   ),
                 );

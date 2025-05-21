@@ -4,7 +4,6 @@ import 'package:sandy_roots/screens/forgetpass.dart';
 import 'package:sandy_roots/screens/Appbar_buyer.dart';
 import 'package:sandy_roots/screens/AppBar_admin.dart';
 import 'package:sandy_roots/services/animasion.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:sandy_roots/services/ShowUserJsonScreen%20.dart';
 
 class Mainlogin extends StatefulWidget {
@@ -78,6 +77,7 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
                             color: Color(0xFFFAF0E6).withOpacity(0.6),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
+                              
                               //บนซ้าย
                               BoxShadow(
                                 color: Colors.white.withOpacity(0.2),
@@ -96,7 +96,7 @@ class _LoginState extends State<Mainlogin> with SingleTickerProviderStateMixin {
                           ),
                           height: screenHeight * _containerHeightFactor,
                           width: screenWidth * 0.9,
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          margin:  EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
                             children: [
                               TabBar(
@@ -170,18 +170,6 @@ class __LoginState extends State<_Login> {
   }
 
 
-
-  Future<void> saveLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-  }
-
-  Future<void> clearLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('isLoggedIn');
-  }
-
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -189,7 +177,7 @@ class __LoginState extends State<_Login> {
 
     return Center(
       child: Container(
-        margin: const EdgeInsets.all(10),
+        margin:  EdgeInsets.all(10),
         child: Form(
           key: _formKey,
           child: Column(
@@ -353,7 +341,7 @@ class __LoginState extends State<_Login> {
                         );
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => ProductsScreen()),
+                          MaterialPageRoute(builder: (context) => AppbarAdmin()),
                         );
                       } else {
                         await widget.userManager.loadUsers(); 
@@ -391,7 +379,7 @@ class __LoginState extends State<_Login> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              duration: Duration(seconds: 3),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         }

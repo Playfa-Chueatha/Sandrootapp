@@ -297,9 +297,18 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
               children: [
                 Text('คำสั่งซื้อที่ ${order['orderNumber'] ?? "-"}',
                         style: const TextStyle(fontSize: 12, color:  Color.fromARGB(255, 107, 107, 107))),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text('ที่อยู่จัดส่ง: ${order['address']}', maxLines: 4, overflow: TextOverflow.ellipsis, style: GoogleFonts.notoSansThai(fontSize: 15))),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Color(0xFFCD853F).withOpacity(0.4)
+                    ),
+                    child: Text(
+                      'ที่อยู่จัดส่ง: ${order['address']}', 
+                      maxLines: 4, 
+                      overflow: TextOverflow.ellipsis, 
+                      style: GoogleFonts.notoSansThai(fontSize: 15)
+                  )),
                 const Text('รายการสินค้า:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 ...List<Map<String, dynamic>>.from(order['cartItems']).map((item) {
@@ -321,8 +330,22 @@ class _Listorder_buyerState extends State<Listorder_buyer> with TickerProviderSt
                               fit: BoxFit.cover,
                             ),
                         const SizedBox(width: 8),
-                        Expanded(child: Text('${item['name']} (x${item['quantity']})')),
-                        Text('${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿'),
+                        Expanded(
+                          child: Text(
+                            '${item['name']} (x${item['quantity']})',
+                            style: GoogleFonts.notoSansThai(),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 70,
+                          child: Text(
+                            '${(item['price'] * item['quantity']).toStringAsFixed(2)} ฿',
+                            textAlign: TextAlign.right,
+                            style: GoogleFonts.notoSansThai(),
+                          ),
+                        ),
                       ],
                     ),
                   );

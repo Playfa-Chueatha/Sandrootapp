@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sandy_roots/services/category_provider.dart';
 
-class CategoryListPage extends StatefulWidget {
-  const CategoryListPage({super.key});
+class editedCategory extends StatefulWidget {
+  const editedCategory({super.key});
 
   @override
-  State<CategoryListPage> createState() => _CategoryListPageState();
+  State<editedCategory> createState() => _CategoryListPageState();
 }
 
-class _CategoryListPageState extends State<CategoryListPage> {
+class _CategoryListPageState extends State<editedCategory> {
   List<String> categories = [];
 
   @override

@@ -24,7 +24,7 @@ class _categoryState extends State<category> {
   }
 
   Future<void> loadCategories() async {
-    await CategoryManager.instance.loadCategories(); // โหลดจาก local storage หรือไฟล์
+    await CategoryManager.instance.loadCategories(); 
     setState(() {
       allCategories = List.from(CategoryManager.instance.categories);
       filteredCategories = List.from(allCategories);

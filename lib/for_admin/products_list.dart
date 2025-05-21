@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sandy_roots/Data/data_Product.dart';
 import 'package:sandy_roots/for_admin/add_product.dart';
@@ -37,7 +38,6 @@ class _ProductsListState extends State<ProductsList> {
       final file = File(filePath);
 
       if (await file.exists()) {
-        // โหลดจาก storage
         final jsonStr = await file.readAsString();
         if (jsonStr.isNotEmpty) {
           final List<Product> loadedProducts =
@@ -47,12 +47,12 @@ class _ProductsListState extends State<ProductsList> {
           });
         }
       } else {
-        // โหลดจาก assets เป็นข้อมูลเริ่มต้น
+       
         final jsonStr = await rootBundle.loadString('assets/data/Products.json');
         final List<Product> loadedProducts =
             (json.decode(jsonStr) as List).map((e) => Product.fromJson(e)).toList();
 
-        // บันทึกไฟล์ใน storage เพื่อใช้ต่อไป
+        
         await file.writeAsString(jsonStr);
 
         setState(() {
@@ -134,7 +134,7 @@ class _ProductsListState extends State<ProductsList> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (c) => const AddProductPage(),
+                  builder: (c) =>  AddProductPage(),
                 ),
               );
               if (result != null && result is Map<String, dynamic>) {
@@ -144,13 +144,13 @@ class _ProductsListState extends State<ProductsList> {
             icon: Icon(Icons.add, color: Colors.white),
             label: Text('เพิ่มสินค้า', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8D6E63), 
+              backgroundColor:  Color(0xFF8D6E63), 
               elevation: 6, 
               shadowColor: Colors.brown.shade200,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12), 
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding:  EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
           ))
         ],
@@ -195,7 +195,7 @@ class _ProductsListState extends State<ProductsList> {
                 Expanded(child: Text(product.name)),
                 Text('${product.price} ฿'),
                 IconButton(
-                  icon: const Icon(Icons.edit),
+                  icon:  FaIcon(FontAwesomeIcons.edit),
                   onPressed: () {
                     Navigator.push(
                       context,

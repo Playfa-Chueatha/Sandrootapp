@@ -13,16 +13,16 @@ class AnimatedCircleTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration:  Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      constraints: const BoxConstraints(
+      constraints:  BoxConstraints(
         minWidth: 100,
         minHeight: 50,
       ),
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: AnimatedDefaultTextStyle(
-        duration: const Duration(milliseconds: 300),
+        duration:  Duration(milliseconds: 300),
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: isSelected ? 20 : 16,

@@ -12,8 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // รอ 1 วินาที แล้วไปหน้า Mainlogin
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed( Duration(seconds: 1), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Mainlogin()),
@@ -26,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F7F3), // สีครีม
+      backgroundColor: const Color(0xFFF9F7F3),
       body: Center(
         child: Image.asset(
           'assets/images/logosandroots.png',

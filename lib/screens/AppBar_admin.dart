@@ -9,14 +9,14 @@ import 'package:sandy_roots/for_admin/Myaccount.dart';
 import 'package:sandy_roots/for_admin/products_list.dart';
 
 
-class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key});
+class AppbarAdmin extends StatefulWidget {
+  const AppbarAdmin({super.key});
 
   @override
-  State<ProductsScreen> createState() => _OrderScreenState();
+  State<AppbarAdmin> createState() => _OrderScreenState();
 }
 
-class _OrderScreenState extends State<ProductsScreen> {
+class _OrderScreenState extends State<AppbarAdmin> {
   List<Product> products = [];
   int _currentIndex = 0;
 
@@ -64,10 +64,10 @@ class _OrderScreenState extends State<ProductsScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         currentIndex: _currentIndex,
-        selectedItemColor: const Color(0xFF8B6F4D),
-        unselectedItemColor: const Color.fromARGB(255, 0, 0, 0),
+        selectedItemColor:  Color(0xFF8B6F4D),
+        unselectedItemColor:  Color.fromARGB(255, 0, 0, 0),
         onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
+        items:  [
           BottomNavigationBarItem(
             icon: Icon(FontAwesomeIcons.store),
             label: 'จัดการสินค้า',backgroundColor: Color(0xFFf6f3ec)

@@ -40,7 +40,7 @@ class _BuyerViewState extends State<BuyerView> {
       _filteredProducts = _products;
     });
   } else {
-    // กรณีที่ยังไม่มีไฟล์ ให้ copy จาก assets มา
+    
     final raw = await rootBundle.loadString('assets/data/Products.json');
     await file.writeAsString(raw);
     final data = json.decode(raw) as List;
@@ -60,7 +60,7 @@ class _BuyerViewState extends State<BuyerView> {
       return;
     }
 
-    // เก็บประวัติการค้นหา
+    
     if (!_searchHistory.contains(query)) {
       setState(() {
         _searchHistory.insert(0, query);
